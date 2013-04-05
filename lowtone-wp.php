@@ -16,7 +16,12 @@ namespace lowtone\wp {
 	
 	if (!class_exists("lowtone\\Lowtone"))
 		return;
+
 	
 	Util::addMergedPath(__NAMESPACE__);
+
+	// Admin notices
+	
+	admin\notices\Notice::init();
 	
 }
