@@ -343,6 +343,14 @@ class Post extends Record implements interfaces\Post, interfaces\Registrable {
 
 		return compact("left", "right");
 	}
+
+	// Admin URL
+
+	public function __adminUrl() {
+		return isset($this) && $this instanceof Post 
+			? URL::fromString(admin_url("post.php"))->query(array("post" => $this->ID, "action" => "edit"))
+			: URL::fromString(admin_url("edit.php"))->query(array("post_type" => static::__postType()));
+	}
 	
 	// Post property getters
 	
@@ -599,7 +607,7 @@ class Post extends Record implements interfaces\Post, interfaces\Registrable {
 			self::PROPERTY_POST_TYPE => array(
 					Property::ATTRIBUTE_TYPE => Property::TYPE_STRING,
 					Property::ATTRIBUTE_LENGTH => 20,
-					Property::ATTRIBUTE_DEFAULT_VALUE => strtolower(end(split("\\\\", get_called_class())))
+					Property::ATTRIBUTE_DEFAULT_VALUE => strtolower(end(explode("\\\\", get_called_class())))
 				),
 			self::PROPERTY_POST_MIME_TYPE => array(
 					Property::ATTRIBUTE_TYPE => Property::TYPE_STRING,

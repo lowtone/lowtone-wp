@@ -17,6 +17,12 @@ class Notice extends ErrorException {
 		parent::__construct($message, $code, $severity, $filename, $lineno, $previous);
 	}
 
+	public function __toString() {
+		return '<div class="' . ($this->getSeverity() > 0 ? "error" : "updated") . '">' . 
+					$this->getMessage() .
+				'</div>';
+	}
+
 	public function __sleep() {
 		return array(
 				"message",
@@ -49,9 +55,7 @@ class Notice extends ErrorException {
 
 	public static function out() {
 		foreach ((array) self::$notices as $notice) {
-			echo '<div class="' . ($notice->getSeverity() > 0 ? "error" : "updated") . '">' . 
-					$notice->getMessage() .
-				'</div>';
+			echo (string) $notice;
 		}
 
 		self::clear();
