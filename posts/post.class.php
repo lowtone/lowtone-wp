@@ -189,6 +189,8 @@ class Post extends Record implements interfaces\Post, interfaces\Registrable {
 		$taxonomies = array_map(function($taxonomy) {
 			return $taxonomy->getName();
 		}, $this->getTaxonomies()->getObjects());
+
+		$taxonomies = array_values($taxonomies);
 		
 		if (is_wp_error($terms = wp_get_object_terms($postId, $taxonomies)))
 			$terms = array();
