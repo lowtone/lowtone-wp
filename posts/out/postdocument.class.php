@@ -157,8 +157,9 @@ class PostDocument extends ObjectDocument implements WpDocument {
 					$taxonomyDocument = $taxonomy->createDocument();
 
 					$taxonomyDocument->build();
-					
-					$taxonomyDocument->documentElement->appendCreateElement("terms", $termsByTaxonomy[$taxonomy->getName()]);
+
+					if (isset($termsByTaxonomy[$taxonomy->getName()]))
+						$taxonomyDocument->documentElement->appendCreateElement("terms", $termsByTaxonomy[$taxonomy->getName()]);
 
 					return $taxonomyDocument;
 				}, $taxonomies->getObjects()));
