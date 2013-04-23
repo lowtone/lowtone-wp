@@ -189,7 +189,7 @@ class PostDocument extends ObjectDocument implements WpDocument {
 		if ($this->getBuildOption(self::BUILD_COMMENTS)) {
 			$this->itsObject->loadComments();
 			
-			$commentsDocument = new CommentsDocument($this->itsObject->getComments());
+			$commentsDocument = new CommentsDocument((array) $this->itsObject->getComments());
 			
 			$commentsDocument->build($this->getBuildOption(self::COMMENTS_DOCUMENT_OPTIONS));
 			
