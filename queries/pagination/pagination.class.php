@@ -24,7 +24,7 @@ class Pagination extends \lowtone\ui\pagination\Pagination {
 	// Getters
 	
 	public function getPageURL($number) {
-		return esc_url(apply_filters("paginate_links", get_pagenum_link($number)));
+		return apply_filters("paginate_links", get_pagenum_link($number, false));
 	}
 	
 	public function getQuery() {
