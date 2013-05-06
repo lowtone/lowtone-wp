@@ -43,7 +43,7 @@ class TabDocument extends ObjectDocument {
 	}
 
 	public function build(array $options = NULL) {
-		$this->updateBuildOptions($options);
+		$this->updateBuildOptions((array) $options);
 
 		if ($this->itsObject->active && $this->getBuildOption(self::BUILD_ACTIVE_CONTENT) && true !== ($buildElements = $this->getBuildOption(self::BUILD_ELEMENTS))) {
 			$buildElements = array_merge((array) $buildElements, array(Tab::PROPERTY_CONTENT));
