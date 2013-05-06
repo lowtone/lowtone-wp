@@ -3,6 +3,7 @@ namespace lowtone\wp\posts;
 use ErrorException,
 	lowtone\db\records\Record,
 	lowtone\db\records\collections\Collection,
+	lowtone\db\records\queries\conditions\Condition,
 	lowtone\db\records\schemata\Schema,
 	lowtone\db\records\schemata\properties\Property,
 	lowtone\net\URL,
@@ -679,6 +680,21 @@ class Post extends Record implements interfaces\Post, interfaces\Registrable {
 		$wp_post_types[$postType]->{self::OPTION_POST_CLASS} = $class;
 
 		return true;
+	}
+
+	public static function allOfType(array $options = NULL) {
+		$options = (array) $options;
+
+		$conditions = new Condition(array(
+				self::PROPERTY_POST_TYPE => static::__postType()
+			));
+
+		if (isset($options[self::OPTION_CONDITIONS]))
+			$conditions[] = $options[self::OPTION_CONDITIONS];
+		
+		$options[self::OPTION_CONDITIONS] = $conditions;
+		
+		return parent::all($options);
 	}
 	
 }
