@@ -6,6 +6,9 @@ use ErrorException,
 	lowtone\db\records\queries\conditions\Condition,
 	lowtone\db\records\schemata\Schema,
 	lowtone\db\records\schemata\properties\Property,
+	lowtone\db\records\schemata\properties\types\DateTime as DateTimeProperty,
+	lowtone\db\records\schemata\properties\types\Int as IntProperty,
+	lowtone\db\records\schemata\properties\types\String as StringProperty,
 	lowtone\net\URL,
 	lowtone\types\datetime\DateTime,
 	lowtone\wp\taxonomies\Taxonomy,
@@ -499,133 +502,69 @@ class Post extends Record implements interfaces\Post, interfaces\Registrable {
 
 		return parent::create($properties, $options);
 	}
-	
+
 	public static function __createSchema() {
-		$convertToDateTime = function($val) {
-			return DateTime::createFromString($val);
-		};
+		$bigInt = new IntProperty(array(
+				Property::ATTRIBUTE_LENGTH => IntProperty::LENGTH_BIG,
+				Property::ATTRIBUTE_DEFAULT_VALUE => 0,
+			));
 
-		$timezone = new \DateTimeZone("UTC");
+		$dateTime = new DateTimeProperty();
 
-		$convertToDateTimeUTC = function($val) use ($timezone) {
-			return DateTime::createFromString($val, $timezone);
-		};
+		$convertToUtc = DateTimeProperty::createConvertToDateTime("Y-m-d H:i:s", new \DateTimeZone("utc"));
 
-		$schema = new Schema(array(
-			self::PROPERTY_ID => array(
-					Property::ATTRIBUTE_INDEXES => array(Property::INDEX_PRIMARY_KEY),
-					Property::ATTRIBUTE_TYPE => Property::TYPE_INT,
-					Property::ATTRIBUTE_LENGTH => 20 // BIGINT
-				),
-			self::PROPERTY_POST_AUTHOR => array(
-					Property::ATTRIBUTE_TYPE => Property::TYPE_INT,
-					Property::ATTRIBUTE_LENGTH => 20, // BIGINT
-					Property::ATTRIBUTE_DEFAULT_VALUE => 0
-				),
-			self::PROPERTY_POST_DATE => array(
-					Property::ATTRIBUTE_TYPE => Property::TYPE_DATETIME,
-					Property::ATTRIBUTE_SET => $convertToDateTime,
-					Property::ATTRIBUTE_UNSERIALIZE => $convertToDateTime,
-					Property::ATTRIBUTE_DEFAULT_VALUE => "0000-00-00 00:00:00"
-				),
-			self::PROPERTY_POST_DATE_GMT => array(
-					Property::ATTRIBUTE_TYPE => Property::TYPE_DATETIME,
-					Property::ATTRIBUTE_SET => $convertToDateTimeUTC,
-					Property::ATTRIBUTE_UNSERIALIZE => $convertToDateTimeUTC,
-					Property::ATTRIBUTE_DEFAULT_VALUE => "0000-00-00 00:00:00"
-				),
-			self::PROPERTY_POST_CONTENT => array(
-					Property::ATTRIBUTE_TYPE => Property::TYPE_STRING,
-					Property::ATTRIBUTE_LENGTH => 4294967295 // LONGTEXT
-				),
-			self::PROPERTY_POST_TITLE => array(
-					Property::ATTRIBUTE_TYPE => Property::TYPE_STRING,
-					Property::ATTRIBUTE_LENGTH => 65535 // TEXT
-				),
-			self::PROPERTY_POST_EXCERPT => array(
-					Property::ATTRIBUTE_TYPE => Property::TYPE_STRING,
-					Property::ATTRIBUTE_LENGTH => 65535 // TEXT
-				),
-			self::PROPERTY_POST_STATUS => array(
-					Property::ATTRIBUTE_TYPE => Property::TYPE_STRING,
-					Property::ATTRIBUTE_LENGTH => 20,
-					Property::ATTRIBUTE_DEFAULT_VALUE => self::STATUS_PUBLISH
-				),
-			self::PROPERTY_COMMENT_STATUS => array(
-					Property::ATTRIBUTE_TYPE => Property::TYPE_STRING,
-					Property::ATTRIBUTE_LENGTH => 20,
-					Property::ATTRIBUTE_DEFAULT_VALUE => self::STATUS_OPEN
-				),
-			self::PROPERTY_PING_STATUS => array(
-					Property::ATTRIBUTE_TYPE => Property::TYPE_STRING,
-					Property::ATTRIBUTE_LENGTH => 20,
-					Property::ATTRIBUTE_DEFAULT_VALUE => self::STATUS_OPEN
-				),
-			self::PROPERTY_POST_PASSWORD => array(
-					Property::ATTRIBUTE_TYPE => Property::TYPE_STRING,
-					Property::ATTRIBUTE_LENGTH => 20
-				),
-			self::PROPERTY_POST_NAME => array(
-					Property::ATTRIBUTE_TYPE => Property::TYPE_STRING,
-					Property::ATTRIBUTE_LENGTH => 100
-				),
-			self::PROPERTY_TO_PING => array(
-					Property::ATTRIBUTE_TYPE => Property::TYPE_STRING,
-					Property::ATTRIBUTE_LENGTH => 65535 // TEXT
-				),
-			self::PROPERTY_PINGED => array(
-					Property::ATTRIBUTE_TYPE => Property::TYPE_STRING,
-					Property::ATTRIBUTE_LENGTH => 65535 // TEXT
-				),
-			self::PROPERTY_POST_MODIFIED => array(
-					Property::ATTRIBUTE_TYPE => Property::TYPE_DATETIME,
-					Property::ATTRIBUTE_SET => $convertToDateTime,
-					Property::ATTRIBUTE_UNSERIALIZE => $convertToDateTime,
-					Property::ATTRIBUTE_DEFAULT_VALUE => "0000-00-00 00:00:00"
-				),
-			self::PROPERTY_POST_MODIFIED_GMT => array(
-					Property::ATTRIBUTE_TYPE => Property::TYPE_DATETIME,
-					Property::ATTRIBUTE_SET => $convertToDateTimeUTC,
-					Property::ATTRIBUTE_UNSERIALIZE => $convertToDateTimeUTC,
-					Property::ATTRIBUTE_DEFAULT_VALUE => "0000-00-00 00:00:00"
-				),
-			self::PROPERTY_POST_CONTENT_FILTERED => array(
-					Property::ATTRIBUTE_TYPE => Property::TYPE_STRING,
-					Property::ATTRIBUTE_LENGTH => 4294967295 // LONGTEXT
-				),
-			self::PROPERTY_POST_PARENT => array(
-					Property::ATTRIBUTE_TYPE => Property::TYPE_INT,
-					Property::ATTRIBUTE_LENGTH => 20, // BIGINT
-					Property::ATTRIBUTE_DEFAULT_VALUE => 0
-				),
-			self::PROPERTY_GUID => array(
-					Property::ATTRIBUTE_TYPE => Property::TYPE_STRING,
-					Property::ATTRIBUTE_LENGTH => 255
-				),
-			self::PROPERTY_MENU_ORDER => array(
-					Property::ATTRIBUTE_TYPE => Property::TYPE_INT,
-					Property::ATTRIBUTE_LENGTH => 11,
-					Property::ATTRIBUTE_DEFAULT_VALUE => 0
-				),
-			self::PROPERTY_POST_TYPE => array(
-					Property::ATTRIBUTE_TYPE => Property::TYPE_STRING,
-					Property::ATTRIBUTE_LENGTH => 20,
-					Property::ATTRIBUTE_DEFAULT_VALUE => strtolower(end(explode("\\\\", get_called_class())))
-				),
-			self::PROPERTY_POST_MIME_TYPE => array(
-					Property::ATTRIBUTE_TYPE => Property::TYPE_STRING,
-					Property::ATTRIBUTE_LENGTH => 100
-				),
-			self::PROPERTY_COMMENT_COUNT => array(
-					Property::ATTRIBUTE_TYPE => Property::TYPE_INT,
-					Property::ATTRIBUTE_LENGTH => 20, // BIGINT
-					Property::ATTRIBUTE_DEFAULT_VALUE => 0
-				)
-		));
-	
-		$schema->setRecordClass(get_called_class());
+		$dateTimeGmt = new DateTimeProperty(array(
+				Property::ATTRIBUTE_SET => $convertToUtc,
+				Property::ATTRIBUTE_UNSERIALIZE => $convertToUtc,
+			));
 
-		return $schema;
+		$longText = new StringProperty(array(
+				Property::ATTRIBUTE_LENGTH => StringProperty::LENGTH_LONG,
+			));
+
+		return parent::__createSchema(array(
+				self::PROPERTY_POST_AUTHOR => $bigInt,
+				self::PROPERTY_POST_DATE => $dateTime,
+				self::PROPERTY_POST_DATE_GMT => $dateTimeGmt,
+				self::PROPERTY_POST_CONTENT => $longText,
+				self::PROPERTY_POST_STATUS => new StringProperty(array(
+						Property::ATTRIBUTE_LENGTH => 20,
+						Property::ATTRIBUTE_DEFAULT_VALUE => self::STATUS_PUBLISH
+					)),
+				self::PROPERTY_COMMENT_STATUS => new StringProperty(array(
+						Property::ATTRIBUTE_LENGTH => 20,
+						Property::ATTRIBUTE_DEFAULT_VALUE => self::STATUS_OPEN
+					)),
+				self::PROPERTY_PING_STATUS => new StringProperty(array(
+						Property::ATTRIBUTE_LENGTH => 20,
+						Property::ATTRIBUTE_DEFAULT_VALUE => self::STATUS_OPEN
+					)),
+				self::PROPERTY_POST_PASSWORD => new StringProperty(array(
+						Property::ATTRIBUTE_LENGTH => 20
+					)),
+				self::PROPERTY_POST_NAME => new StringProperty(array(
+						Property::ATTRIBUTE_LENGTH => 100
+					)),
+				self::PROPERTY_POST_MODIFIED => $dateTime,
+				self::PROPERTY_POST_MODIFIED_GMT => $dateTimeGmt,
+				self::PROPERTY_POST_CONTENT_FILTERED => $longText,
+				self::PROPERTY_POST_PARENT => $bigInt,
+				self::PROPERTY_GUID => new StringProperty(array(
+						Property::ATTRIBUTE_LENGTH => 255
+					)),
+				self::PROPERTY_MENU_ORDER => new IntProperty(array(
+						Property::ATTRIBUTE_LENGTH => 11,
+						Property::ATTRIBUTE_DEFAULT_VALUE => 0,
+					)),
+				self::PROPERTY_POST_TYPE => new StringProperty(array(
+						Property::ATTRIBUTE_LENGTH => 20,
+						Property::ATTRIBUTE_DEFAULT_VALUE => static::__postType()
+					)),
+				self::PROPERTY_POST_MIME_TYPE => new StringProperty(array(
+						Property::ATTRIBUTE_LENGTH => 100
+					)),
+				self::PROPERTY_COMMENT_COUNT => $bigInt,
+			));
 	}
 	
 	public static function __getDocumentClass() {
