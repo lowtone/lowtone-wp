@@ -1,6 +1,7 @@
 <?php
 namespace lowtone\wp\widgets\simple;
 use WP_Widget_Factory,
+	lowtone\types\strings\String,
 	lowtone\ui\forms\Form,
 	lowtone\ui\forms\Input,
 	lowtone\ui\forms\base\FormElement,
@@ -41,11 +42,14 @@ final class Widget extends Base {
 	public function __construct(array $properties = NULL) {
 		$properties = (array) $properties;
 
-		if (!($id = trim(@$properties[self::PROPERTY_ID])))
-			trigger_error("Simple Widget created with empty ID", E_USER_NOTICE);
-
-		if (!($name = trim(@$properties[self::PROPERTY_NAME])))
+		if (!(isset($properties[self::PROPERTY_NAME]) && ($name = trim($properties[self::PROPERTY_NAME])))) {
 			trigger_error("Simple Widget created without a name", E_USER_NOTICE);
+
+			$name = static::__createName();
+		}
+
+		if (!(isset($properties[self::PROPERTY_ID]) && ($id = trim($properties[self::PROPERTY_ID]))))
+			$id = static::__createId($name);
 
 		$args = array_diff_key($properties, array_flip(array(
 				self::PROPERTY_ID, 
@@ -57,9 +61,14 @@ final class Widget extends Base {
 
 		parent::__construct($id, $name, $args);
 
-		$this->itsForm = @$properties[self::PROPERTY_FORM];
-		$this->itsUpdate = @$properties[self::PROPERTY_UPDATE];
-		$this->itsWidget = @$properties[self::PROPERTY_WIDGET];
+		if (isset($properties[self::PROPERTY_FORM]))
+			$this->itsForm = $properties[self::PROPERTY_FORM];
+
+		if (isset($properties[self::PROPERTY_UPDATE]))
+			$this->itsUpdate = $properties[self::PROPERTY_UPDATE];
+
+		if (isset($properties[self::PROPERTY_WIDGET]))
+			$this->itsWidget = $properties[self::PROPERTY_WIDGET];
 
 	}
 	
@@ -129,6 +138,33 @@ final class Widget extends Base {
 		trigger_error("Can't register the Simple Widget class as a Widget; use lowtone\wp\widgets\simple\Widget::register() to register an Simple Widget instance");
 
 		return false;
+	}
+
+	public static function __createName() {
+		$caller = function() {
+			foreach (debug_backtrace() as $trace) {
+				if (__FILE__ == $trace["file"])
+					continue;
+
+				return $trace["file"];
+			}
+
+			return false;
+		};
+
+		$name = basename($caller(), ".php");
+
+		$name = preg_replace("/[^a-z]/i", " ", $name);
+
+		$name = preg_replace('/([^A-Z])([A-Z])/', "$1 $2", $name);
+
+		$name = preg_replace("/ +/", " ", $name);
+
+		return ucwords($name);
+	}
+
+	public static function __createId($name) {
+		return trim(strtolower(preg_replace("/[^a-z]+/i", "_", $name)), "_ ");
 	}
 	
 }
