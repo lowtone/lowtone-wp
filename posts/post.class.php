@@ -503,7 +503,7 @@ class Post extends Record implements interfaces\Post, interfaces\Registrable {
 		return parent::create($properties, $options);
 	}
 
-	public static function __createSchema() {
+	public static function __createSchema($defaults = NULL) {
 		$bigInt = new IntProperty(array(
 				Property::ATTRIBUTE_LENGTH => IntProperty::LENGTH_BIG,
 				Property::ATTRIBUTE_DEFAULT_VALUE => 0,
@@ -522,7 +522,7 @@ class Post extends Record implements interfaces\Post, interfaces\Registrable {
 				Property::ATTRIBUTE_LENGTH => StringProperty::LENGTH_LONG,
 			));
 
-		return parent::__createSchema(array(
+		return parent::__createSchema(array_merge(array(
 				self::PROPERTY_POST_AUTHOR => $bigInt,
 				self::PROPERTY_POST_DATE => $dateTime,
 				self::PROPERTY_POST_DATE_GMT => $dateTimeGmt,
@@ -564,7 +564,7 @@ class Post extends Record implements interfaces\Post, interfaces\Registrable {
 						Property::ATTRIBUTE_LENGTH => 100
 					)),
 				self::PROPERTY_COMMENT_COUNT => $bigInt,
-			));
+			), (array) $defaults));
 	}
 	
 	public static function __getDocumentClass() {
