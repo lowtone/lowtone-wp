@@ -85,7 +85,7 @@ final class Widget extends Base {
 
 		$widget = $this;
 		
-		$out = $form
+		$form
 			->setValues($instance)
 			->walkChildren(function($element) use ($widget) {
 				if (!($element instanceof Input))
@@ -93,13 +93,9 @@ final class Widget extends Base {
 				
 				$element[Input::PROPERTY_NAME] = $widget->get_field_name($element[Input::PROPERTY_NAME]);
 			})
-			->createDocument()
-			->build()
-			->setTemplate(realpath(LIB_DIR . "/lowtone/ui/forms/templates/form-content.xsl"))
-			->transform()
-			->saveHTML();
-
-		echo $out;
+			->out(array(
+				"template" => realpath(LIB_DIR . "/lowtone/ui/forms/templates/form-content.xsl")
+			));
 
 		return true;
 	}
