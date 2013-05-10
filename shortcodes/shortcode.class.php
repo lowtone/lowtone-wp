@@ -1,5 +1,6 @@
 <?php
 namespace lowtone\wp\shortcodes;
+use lowtone\db\records\Record;
 
 /**
  * @author Paul van der Meijs <code@paulvandermeijs.nl>
@@ -8,13 +9,29 @@ namespace lowtone\wp\shortcodes;
  * @version 1.1
  * @package wordpress\libs\lowtone\wp\shortcodes
  */
-class Shortcode {
+class Shortcode extends Record {
+
+	const PROPERTY_TAG = "tag",
+		PROPERTY_ATTS = "atts",
+		PROPERTY_CONTENT = "content";
 	
 	public static function extractShortcodes($content) {
-		if (!preg_match_all('/'. get_shortcode_regex() .'/s', $content, $matches))
-			return NULL;
+		$shortcodes = array();
 
-		return implode($matches[0]);
+		if (!preg_match_all('/'. get_shortcode_regex() .'/s', $content, $matches))
+			return array();
+
+		foreach ($matches[0] as $index => $shortcode) {
+
+			$shortcodes[] = new Shortcode(array(
+					self::PROPERTY_TAG => $matches[2][$index],
+					self::PROPERTY_ATTS => shortcode_parse_atts($matches[3][$index]),
+					self::PROPERTY_CONTENT => $matches[5][$index]
+				));
+
+		}
+
+		return $shortcodes;
 	}
 
 }
