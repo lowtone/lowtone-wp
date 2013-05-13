@@ -32,7 +32,8 @@ class PostDocument extends ObjectDocument implements WpDocument {
 		COMMENT_FORM_DOCUMENT_OPTIONS = "comment_form_document_options",
 		BUILD_ADJACENT = "build_adjacent",
 		ADJACENT_DOCUMENT_OPTIONS = "adjacent_document_options",
-		OPTION_ADJACENT = "adjacent";
+		OPTION_ADJACENT = "adjacent",
+		USE_TEMPLATE_FUNCTIONS = "use_template_functions";
 	
 	public function __construct(Post $post) {
 		parent::__construct($post);
@@ -45,6 +46,22 @@ class PostDocument extends ObjectDocument implements WpDocument {
 
 		$dateFormat = get_option(self::DATE_FORMAT);
 		$timeFormat = get_option(self::TIME_FORMAT);
+
+		$this->itsBuildOptions->setRecursive(false);
+
+		$formatTitle = function($title) use ($document) {
+			if (!$document->getBuildOption(PostDocument::USE_TEMPLATE_FUNCTIONS))
+				return $title;
+
+			return apply_filters("post_document_title", Util::catchOutput("the_title"));
+		};
+
+		$formatContent = function($content) use ($document) {
+			if (!$document->getBuildOption(PostDocument::USE_TEMPLATE_FUNCTIONS))
+				return $content;
+
+			return apply_filters("post_document_content", Util::catchOutput("the_content"));
+		};
 		
 		$this->updateBuildOptions(array(
 			self::OBJECT_ELEMENT_NAME => "post",
@@ -72,9 +89,12 @@ class PostDocument extends ObjectDocument implements WpDocument {
 			self::DATETIME_FORMAT => $dateFormat . ", " . $timeFormat,
 			self::PROPERTY_FILTERS => array(
 				Post::PROPERTY_POST_DATE => $formatDate,
-				Post::PROPERTY_POST_MODIFIED => $formatDate
+				Post::PROPERTY_POST_MODIFIED => $formatDate,
+				Post::PROPERTY_POST_TITLE => $formatTitle,
+				Post::PROPERTY_POST_CONTENT => $formatContent,
 			),
-			self::STRIP_PROPERTY_PREFIX => "post_"
+			self::STRIP_PROPERTY_PREFIX => "post_",
+			self::USE_TEMPLATE_FUNCTIONS => true,
 		));
 	}
 	
@@ -266,9 +286,6 @@ class PostDocument extends ObjectDocument implements WpDocument {
 		$properties = parent::extractProperties();
 
 		$properties["permalink"] = get_permalink();
-
-		$properties[Post::PROPERTY_POST_TITLE] = apply_filters("post_document_title", Util::catchOutput("the_title"));
-		$properties[Post::PROPERTY_POST_CONTENT] = apply_filters("post_document_content", Util::catchOutput("the_content"));
 
 		return $properties;
 	}

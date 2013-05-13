@@ -26,7 +26,7 @@ class Collection extends Base {
 	}
 	
 	public static function __getDocumentClass() {
-		return "lowtone\\wp\\posts\\collections\\out\\CollectionDocument";
+		return __NAMESPACE__ . "\\out\\CollectionDocument";
 	}
 
 }
