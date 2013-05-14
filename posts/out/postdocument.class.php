@@ -68,7 +68,7 @@ class PostDocument extends ObjectDocument implements WpDocument {
 				return $excerpt;
 
 			return apply_filters("post_document_excerpt", Util::catchOutput("the_excerpt"));
-		}
+		};
 		
 		$this->updateBuildOptions(array(
 			self::OBJECT_ELEMENT_NAME => "post",
