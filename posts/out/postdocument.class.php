@@ -62,6 +62,13 @@ class PostDocument extends ObjectDocument implements WpDocument {
 
 			return apply_filters("post_document_content", Util::catchOutput("the_content"));
 		};
+
+		$formatExcerpt = function($excerpt) use ($document) {
+			if (!$document->getBuildOption(PostDocument::USE_TEMPLATE_FUNCTIONS))
+				return $excerpt;
+
+			return apply_filters("post_document_excerpt", Util::catchOutput("the_excerpt"));
+		}
 		
 		$this->updateBuildOptions(array(
 			self::OBJECT_ELEMENT_NAME => "post",
@@ -88,10 +95,11 @@ class PostDocument extends ObjectDocument implements WpDocument {
 			self::TIME_FORMAT => $timeFormat,
 			self::DATETIME_FORMAT => $dateFormat . ", " . $timeFormat,
 			self::PROPERTY_FILTERS => array(
-				Post::PROPERTY_POST_DATE => $formatDate,
-				Post::PROPERTY_POST_MODIFIED => $formatDate,
 				Post::PROPERTY_POST_TITLE => $formatTitle,
 				Post::PROPERTY_POST_CONTENT => $formatContent,
+				Post::PROPERTY_POST_EXCERPT => $formatExcerpt,
+				Post::PROPERTY_POST_DATE => $formatDate,
+				Post::PROPERTY_POST_MODIFIED => $formatDate,
 			),
 			self::STRIP_PROPERTY_PREFIX => "post_",
 			self::USE_TEMPLATE_FUNCTIONS => true,
