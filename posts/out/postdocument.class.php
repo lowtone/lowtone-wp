@@ -280,7 +280,8 @@ class PostDocument extends ObjectDocument implements WpDocument {
 				->createAppendElement("locales", array(
 					"date_title" => __("Date"),
 					"modified_title" => __("Last modified"),
-					"read_more" => __("Read more")
+					"author_title" => __("Author"),
+					"read_more" => __("Read more"),
 				));
 			
 		}
