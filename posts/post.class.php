@@ -576,7 +576,7 @@ class Post extends Record implements interfaces\Post, interfaces\Registrable {
 	}
 
 	public static function __postType() {
-		return strtolower(basename(get_called_class()));
+		return strtolower(end(explode("\\", get_called_class())));
 	}
 
 	public static function __register(array $options = NULL) {
