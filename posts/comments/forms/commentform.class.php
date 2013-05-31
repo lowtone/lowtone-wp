@@ -18,40 +18,40 @@ class CommentForm extends Form implements Buildable {
 		$this
 			->appendChild(
 					$this->createFieldSet(array(
-								FieldSet::PROPERTY_LEGEND => __("Author")
+								FieldSet::PROPERTY_LEGEND => __("Author", "lowtone_wp")
 							))
 						->appendChild(
 								$this->createInput(Input::TYPE_TEXT, array(
 										Input::PROPERTY_NAME => "name",
-										Input::PROPERTY_LABEL => __("Name")
+										Input::PROPERTY_LABEL => __("Name", "lowtone_wp")
 									))
 							)
 						->appendChild(
 								$this->createInput(Input::TYPE_TEXT, array(
 										Input::PROPERTY_NAME => "email",
-										Input::PROPERTY_LABEL => __("Email")
+										Input::PROPERTY_LABEL => __("Email", "lowtone_wp")
 									))
 							)
 				)
 			->appendChild(
 					$this->createFieldSet(array(
-								FieldSet::PROPERTY_LEGEND => __("Website")
+								FieldSet::PROPERTY_LEGEND => __("Website", "lowtone_wp")
 							))
 						->appendChild(
 								$this->createInput(Input::TYPE_TEXT, array(
 										Input::PROPERTY_NAME => "url",
-										Input::PROPERTY_LABEL => __("Website")
+										Input::PROPERTY_LABEL => __("Website", "lowtone_wp")
 									))
 							)
 				)
 			->appendChild(
 					$this->createFieldSet(array(
-								FieldSet::PROPERTY_LEGEND => __("Message")
+								FieldSet::PROPERTY_LEGEND => __("Message", "lowtone_wp")
 							))
 						->appendChild(
 								$this->createInput(Input::TYPE_TEXT, array(
 										Input::PROPERTY_NAME => "message",
-										Input::PROPERTY_LABEL => __("Message"),
+										Input::PROPERTY_LABEL => __("Message", "lowtone_wp"),
 										Input::PROPERTY_MULTIPLE => true
 									))
 							)
@@ -59,7 +59,7 @@ class CommentForm extends Form implements Buildable {
 			->appendChild(
 					$this->createInput(Input::TYPE_SUBMIT, array(
 							Input::PROPERTY_NAME => "submit",
-							Input::PROPERTY_VALUE => __("Post comment")
+							Input::PROPERTY_VALUE => __("Post comment", "lowtone_wp")
 						))
 				);
 

@@ -53,8 +53,8 @@ class CommentsDocument extends Document {
 			
 			$commentsElement
 				->appendCreateElement("locales", array(
-					"title" => __("Replies to this article"),
-					"no_comments" => __("No comments.")
+					"title" => __("Replies to this article", "lowtone_wp"),
+					"no_comments" => __("No comments.", "lowtone_wp")
 				));
 			
 		}

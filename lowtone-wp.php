@@ -23,5 +23,12 @@ namespace lowtone\wp {
 	// Admin notices
 	
 	admin\notices\Notice::init();
+
+	// Load text domain
+	
+	add_action("plugins_loaded", function() {
+		load_textdomain("lowtone_wp", __DIR__ . "/assets/languages/" . get_locale() . ".mo");
+	});
+	
 	
 }

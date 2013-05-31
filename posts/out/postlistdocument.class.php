@@ -47,8 +47,8 @@ class PostListDocument extends ObjectListDocument {
 			
 			$postListElement
 				->appendCreateElement("locales", array(
-					"title" => __("Posts"),
-					"no_posts" => __("No posts.")
+					"title" => __("Posts", "lowtone_wp"),
+					"no_posts" => __("No posts.", "lowtone_wp")
 				));
 			
 		}

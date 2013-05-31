@@ -66,16 +66,16 @@ class CommentDocument extends ObjectDocument implements WpDocument {
 			
 			$commentElement
 				->appendCreateElement("locales", array(
-					"author" => __("Author"),
-					"author_email" => __("Email"),
-					"author_url" => __("URL"),
-					"author_ip" => __("IP"),
-					"date" => __("Date / Time"),
-					"content" => __("Message"),
-					"karma" => __("Karma"),
-					"approved" => __("Approved"),
-					"agent" => __("User agent"),
-					"type" => __("Type")
+					"author" => __("Author", "lowtone_wp"),
+					"author_email" => __("Email", "lowtone_wp"),
+					"author_url" => __("URL", "lowtone_wp"),
+					"author_ip" => __("IP", "lowtone_wp"),
+					"date" => __("Date / Time", "lowtone_wp"),
+					"content" => __("Message", "lowtone_wp"),
+					"karma" => __("Karma", "lowtone_wp"),
+					"approved" => __("Approved", "lowtone_wp"),
+					"agent" => __("User agent", "lowtone_wp"),
+					"type" => __("Type", "lowtone_wp")
 				));
 			
 		}

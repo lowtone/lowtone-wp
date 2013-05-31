@@ -145,8 +145,8 @@ class PostDocument extends ObjectDocument implements WpDocument {
 				
 				$customFieldsElement
 					->appendCreateElement("locales", array(
-						"title" => __("Extra fields"),
-						"no_meta" => __("No extra fields.")
+						"title" => __("Extra fields", "lowtone_wp"),
+						"no_meta" => __("No extra fields.", "lowtone_wp")
 					));
 					
 			}
@@ -253,7 +253,7 @@ class PostDocument extends ObjectDocument implements WpDocument {
 				$adjacentElement->createAppendElement("left", array(
 						"post" => $left->__toDocument()->build($adjacentBuildOptions),
 						"locales" => array(
-							"title" => apply_filters("adjacent_title_left_" . $this->itsObject->getPostType(), apply_filters("adjacent_title_left", __("Previous post")))
+							"title" => apply_filters("adjacent_title_left_" . $this->itsObject->getPostType(), apply_filters("adjacent_title_left", __("Previous post", "lowtone_wp")))
 						)
 					));
 
@@ -264,7 +264,7 @@ class PostDocument extends ObjectDocument implements WpDocument {
 				$adjacentElement->createAppendElement("right", array(
 						"post" => $right->__toDocument()->build($adjacentBuildOptions),
 						"locales" => array(
-							"title" => apply_filters("adjacent_title_right_" . $this->itsObject->getPostType(), apply_filters("adjacent_title_right", __("Next post")))
+							"title" => apply_filters("adjacent_title_right_" . $this->itsObject->getPostType(), apply_filters("adjacent_title_right", __("Next post", "lowtone_wp")))
 						)
 					));
 
@@ -278,10 +278,10 @@ class PostDocument extends ObjectDocument implements WpDocument {
 			
 			$localesElement = $postElement
 				->createAppendElement("locales", array(
-					"date_title" => __("Date"),
-					"modified_title" => __("Last modified"),
-					"author_title" => __("Author"),
-					"read_more" => __("Read more"),
+					"date_title" => __("Date", "lowtone_wp"),
+					"modified_title" => __("Last modified", "lowtone_wp"),
+					"author_title" => __("Author", "lowtone_wp"),
+					"read_more" => __("Read more", "lowtone_wp"),
 				));
 			
 		}

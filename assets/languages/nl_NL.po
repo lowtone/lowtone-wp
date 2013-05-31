@@ -1,0 +1,121 @@
+msgid ""
+msgstr ""
+"Project-Id-Version: WordPress Library\n"
+"POT-Creation-Date: 2013-05-31 13:15+0100\n"
+"PO-Revision-Date: 2013-05-31 13:17+0100\n"
+"Last-Translator: Paul van der Meijs <info@lowtone.nl>\n"
+"Language-Team: Lowtone <info@lowtone.nl>\n"
+"Language: Dutch\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"X-Generator: Poedit 1.5.5\n"
+"X-Poedit-KeywordsList: __;_n\n"
+"X-Poedit-Basepath: .\n"
+"X-Poedit-SourceCharset: UTF-8\n"
+"X-Poedit-SearchPath-0: ../..\n"
+
+#: ../../posts/collections/out/collectiondocument.class.php:50
+#: ../../posts/out/postlistdocument.class.php:50
+msgid "Posts"
+msgstr "Berichten"
+
+#: ../../posts/collections/out/collectiondocument.class.php:51
+#: ../../posts/out/postlistdocument.class.php:51
+msgid "No posts."
+msgstr "Geen berichten."
+
+#: ../../posts/comments/forms/commentform.class.php:21
+#: ../../posts/comments/out/commentdocument.class.php:69
+#: ../../posts/out/postdocument.class.php:283
+msgid "Author"
+msgstr "Auteur"
+
+#: ../../posts/comments/forms/commentform.class.php:26
+msgid "Name"
+msgstr "Naam"
+
+#: ../../posts/comments/forms/commentform.class.php:32
+#: ../../posts/comments/out/commentdocument.class.php:70
+msgid "Email"
+msgstr "Email"
+
+#: ../../posts/comments/forms/commentform.class.php:38
+#: ../../posts/comments/forms/commentform.class.php:43
+msgid "Website"
+msgstr "Website"
+
+#: ../../posts/comments/forms/commentform.class.php:49
+#: ../../posts/comments/forms/commentform.class.php:54
+#: ../../posts/comments/out/commentdocument.class.php:74
+msgid "Message"
+msgstr "Bericht"
+
+#: ../../posts/comments/forms/commentform.class.php:62
+#: ../../posts/comments/out/commentformdocument.class.php:52
+msgid "Post comment"
+msgstr "Reactie"
+
+#: ../../posts/comments/out/commentdocument.class.php:71
+msgid "URL"
+msgstr "URL"
+
+#: ../../posts/comments/out/commentdocument.class.php:72
+msgid "IP"
+msgstr "IP"
+
+#: ../../posts/comments/out/commentdocument.class.php:73
+msgid "Date / Time"
+msgstr "Datum / tijd"
+
+#: ../../posts/comments/out/commentdocument.class.php:75
+msgid "Karma"
+msgstr "Karma"
+
+#: ../../posts/comments/out/commentdocument.class.php:76
+msgid "Approved"
+msgstr "Goedgekeurd"
+
+#: ../../posts/comments/out/commentdocument.class.php:77
+msgid "User agent"
+msgstr "User agent"
+
+#: ../../posts/comments/out/commentdocument.class.php:78
+msgid "Type"
+msgstr "Type"
+
+#: ../../posts/comments/out/commentsdocument.class.php:56
+msgid "Replies to this article"
+msgstr "Reacties op dit bericht"
+
+#: ../../posts/comments/out/commentsdocument.class.php:57
+msgid "No comments."
+msgstr "Geen reacties."
+
+#: ../../posts/out/postdocument.class.php:148
+msgid "Extra fields"
+msgstr "Extra velden"
+
+#: ../../posts/out/postdocument.class.php:149
+msgid "No extra fields."
+msgstr "Geen extra velden"
+
+#: ../../posts/out/postdocument.class.php:256
+msgid "Previous post"
+msgstr "Vorige bericht"
+
+#: ../../posts/out/postdocument.class.php:267
+msgid "Next post"
+msgstr "Volgende bericht"
+
+#: ../../posts/out/postdocument.class.php:281
+msgid "Date"
+msgstr "Datum"
+
+#: ../../posts/out/postdocument.class.php:282
+msgid "Last modified"
+msgstr "Laatste wijziging"
+
+#: ../../posts/out/postdocument.class.php:284
+msgid "Read more"
+msgstr "Lees meer"

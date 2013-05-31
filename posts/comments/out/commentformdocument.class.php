@@ -49,7 +49,7 @@ class CommentFormDocument extends Document implements WpDocument {
 		if ($this->getBuildOption(self::BUILD_LOCALES)) {
 
 			$commentFormElement->createAppendElement("locales", array(
-					"title" => __("Post comment")
+					"title" => __("Post comment", "lowtone_wp")
 				));
 
 		}
