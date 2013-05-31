@@ -37,13 +37,13 @@ abstract class Handler {
 	public function __add($priority = 10, $type = "filter") {
 		$rc = new ReflectionClass(get_called_class());
 
+		$func = "add_{$type}";
+
 		$hooks = array();
 
 		foreach ($rc->getMethods() as $method) {
 			if ("_" == $method->name[0])
 				continue;
-
-			$func = "add_{$type}";
 
 			$func($method->name, $this, $priority, $method->getNumberOfParameters());
 
