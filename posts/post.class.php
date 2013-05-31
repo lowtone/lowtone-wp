@@ -3,7 +3,7 @@ namespace lowtone\wp\posts;
 use ErrorException,
 	lowtone\db\records\Record,
 	lowtone\db\records\collections\Collection,
-	lowtone\db\records\queries\conditions\Condition,
+	lowtone\db\queries\conditions\Condition,
 	lowtone\db\records\schemata\Schema,
 	lowtone\db\records\schemata\properties\Property,
 	lowtone\db\records\schemata\properties\types\DateTime as DateTimeProperty,
