@@ -14,14 +14,15 @@ abstract class Handler {
 
 	public function __invoke() {
 		global $wp_current_filter;
-		
-		$hook = end($wp_current_filter);
-		
+
+		if (!($hook = end($wp_current_filter))) 
+			return trigger_error("Hook handler called outside filter or action", E_USER_WARNING) && false;
+
 		if (method_exists($this, $hook)) 
 			return call_user_func_array(array($this, $hook), func_get_args());
-		
-		trigger_error(sprintf("Call to undefined hook handler %s::%s()", __CLASS__, $hook), E_USER_WARNING);
-		
+
+		trigger_error(sprintf("Call to undefined hook handler %s::%s()", get_called_class(), $hook), E_USER_WARNING);
+
 		return func_get_arg(0);
 	}
 
