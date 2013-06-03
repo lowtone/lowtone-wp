@@ -4,6 +4,8 @@ use ErrorException,
 	lowtone\db\records\Record,
 	lowtone\db\records\collections\Collection,
 	lowtone\db\queries\conditions\Condition,
+	lowtone\db\queries\expressions\Column,
+	lowtone\db\queries\expressions\Table,
 	lowtone\db\records\schemata\Schema,
 	lowtone\db\records\schemata\properties\Property,
 	lowtone\db\records\schemata\properties\types\DateTime as DateTimeProperty,
@@ -328,21 +330,26 @@ class Post extends Record implements interfaces\Post, interfaces\Registrable {
 	// Adjacent Posts
 	
 	public function getAdjacent() {
-		$conditions = vsprintf("%s=%s AND %s%%s%s", array(
-				self::__escapeIdentifier(self::PROPERTY_POST_TYPE),
-				self::__escape($this->getPostType()),
-				($postDateColumn = self::__escapeIdentifier(self::PROPERTY_POST_DATE)),
-				self::__escape((string) $this->getPostDate())
-			));
+		$postTable = new Table(Post::__getTable());
+
+		$conditions = new Condition();
+
+		$dateConditions = $conditions
+			->add(new Column(self::PROPERTY_POST_TYPE, $postTable), $this->post_type)
+			->add(new Column(self::PROPERTY_POST_STATUS, $postTable), self::STATUS_PUBLISH)
+			->add(new Column(self::PROPERTY_ID, $postTable), $this->ID, "!=")
+			->add(($postDateColumn = new Column(self::PROPERTY_POST_DATE, $postTable)), $this->post_date, "<=");
 
 		$left = reset(self::all(array(
-				self::OPTION_CONDITIONS => sprintf($conditions, "<"),
+				self::OPTION_CONDITIONS => (string) $conditions,
 				self::OPTION_LIMIT => 1,
 				self::OPTION_ORDER => sprintf("%s DESC", $postDateColumn)
 			))) ?: NULL;
 		
+		$dateConditions->relationalOperator(">=");
+
 		$right = reset(self::all(array(
-				self::OPTION_CONDITIONS => sprintf($conditions, ">"),
+				self::OPTION_CONDITIONS => (string) $conditions,
 				self::OPTION_LIMIT => 1,
 				self::OPTION_ORDER => sprintf("%s ASC", $postDateColumn)
 			))) ?: NULL;
