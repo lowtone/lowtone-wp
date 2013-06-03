@@ -216,7 +216,7 @@ class Post extends Record implements interfaces\Post, interfaces\Registrable {
 			throw new ErrorException("Failed to load Comments for a Post without a numeric ID", 0, E_NOTICE);
 		
 		$options = array_merge((array) $options, array(
-			Comment::PROPERTY_POST_ID => $postId
+			"post_id" => $postId
 		));
 		
 		$this->setComments(get_comments($options));
