@@ -19,16 +19,25 @@ namespace lowtone\wp {
 
 	
 	Util::addMergedPath(__NAMESPACE__);
+	 
+	Util::call(function() {
 
-	// Admin notices
-	
-	admin\notices\Notice::init();
+		// Admin notices
+		
+		admin\notices\Notice::init();
 
-	// Load text domain
-	
-	add_action("plugins_loaded", function() {
-		load_textdomain("lowtone_wp", __DIR__ . "/assets/languages/" . get_locale() . ".mo");
+		// Load text domain
+		
+		$loadTextDomain = function() {
+			if (is_textdomain_loaded("lowtone_wp"))
+				return;
+
+			load_textdomain("lowtone_wp", __DIR__ . "/assets/languages/" . get_locale() . ".mo");
+		};
+
+		add_action("plugins_loaded", $loadTextDomain);
+
+		add_action("after_setup_theme", $loadTextDomain);
 	});
-	
 	
 }
