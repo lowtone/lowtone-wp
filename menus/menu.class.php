@@ -36,8 +36,11 @@ class Menu extends Term {
 	
 	public static function loadMenus() {
 		$menus = array();
+
+		if (!is_array($locations = get_nav_menu_locations()))
+			return $menus;
 		
-		foreach(get_nav_menu_locations() as $location => $id) {
+		foreach($locations as $location => $id) {
 			if (($menu = wp_get_nav_menu_object($id)) === false)
 				continue;
 			
