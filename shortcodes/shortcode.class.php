@@ -82,4 +82,8 @@ class Shortcode extends Record {
 		return $shortcodes;
 	}
 
+	public static function __getCollectionClass() {
+		return __NAMESPACE__ . "\\collections\\Collection";
+	}
+
 }
