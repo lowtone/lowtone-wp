@@ -23,13 +23,15 @@ class CommentForm extends Form implements Buildable {
 						->appendChild(
 								$this->createInput(Input::TYPE_TEXT, array(
 										Input::PROPERTY_NAME => "name",
-										Input::PROPERTY_LABEL => __("Name", "lowtone_wp")
+										Input::PROPERTY_LABEL => __("Name", "lowtone_wp"),
+										Input::PROPERTY_PLACEHOLDER => __("Your name", "lowtone_wp"),
 									))
 							)
 						->appendChild(
 								$this->createInput(Input::TYPE_TEXT, array(
 										Input::PROPERTY_NAME => "email",
-										Input::PROPERTY_LABEL => __("Email", "lowtone_wp")
+										Input::PROPERTY_LABEL => __("Email", "lowtone_wp"),
+										Input::PROPERTY_PLACEHOLDER => __("Your email address", "lowtone_wp"),
 									))
 							)
 				)
@@ -40,7 +42,8 @@ class CommentForm extends Form implements Buildable {
 						->appendChild(
 								$this->createInput(Input::TYPE_TEXT, array(
 										Input::PROPERTY_NAME => "url",
-										Input::PROPERTY_LABEL => __("Website", "lowtone_wp")
+										Input::PROPERTY_LABEL => __("Website", "lowtone_wp"),
+										Input::PROPERTY_PLACEHOLDER => __("Your website", "lowtone_wp"),
 									))
 							)
 				)
@@ -52,7 +55,8 @@ class CommentForm extends Form implements Buildable {
 								$this->createInput(Input::TYPE_TEXT, array(
 										Input::PROPERTY_NAME => "message",
 										Input::PROPERTY_LABEL => __("Message", "lowtone_wp"),
-										Input::PROPERTY_MULTIPLE => true
+										Input::PROPERTY_PLACEHOLDER => __("Your message", "lowtone_wp"),
+										Input::PROPERTY_MULTIPLE => true,
 									))
 							)
 				)

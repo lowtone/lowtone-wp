@@ -1,8 +1,8 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: WordPress Library\n"
-"POT-Creation-Date: 2013-06-03 16:45+0100\n"
-"PO-Revision-Date: 2013-06-03 16:45+0100\n"
+"POT-Creation-Date: 2013-06-06 17:29+0100\n"
+"PO-Revision-Date: 2013-06-06 17:29+0100\n"
 "Last-Translator: Paul van der Meijs <info@lowtone.nl>\n"
 "Language-Team: Lowtone <info@lowtone.nl>\n"
 "Language: Dutch\n"
@@ -35,26 +35,42 @@ msgstr "Auteur"
 msgid "Name"
 msgstr "Naam"
 
-#: ../../posts/comments/forms/commentform.class.php:32
+#: ../../posts/comments/forms/commentform.class.php:27
+msgid "Your name"
+msgstr "Uw naam"
+
+#: ../../posts/comments/forms/commentform.class.php:33
 #: ../../posts/comments/out/commentdocument.class.php:70
 msgid "Email"
 msgstr "Email"
 
-#: ../../posts/comments/forms/commentform.class.php:38
-#: ../../posts/comments/forms/commentform.class.php:43
+#: ../../posts/comments/forms/commentform.class.php:34
+msgid "Your email address"
+msgstr "Uw e-mailadres"
+
+#: ../../posts/comments/forms/commentform.class.php:40
+#: ../../posts/comments/forms/commentform.class.php:45
 msgid "Website"
 msgstr "Website"
 
-#: ../../posts/comments/forms/commentform.class.php:49
-#: ../../posts/comments/forms/commentform.class.php:54
+#: ../../posts/comments/forms/commentform.class.php:46
+msgid "Your website"
+msgstr "Uw website"
+
+#: ../../posts/comments/forms/commentform.class.php:52
+#: ../../posts/comments/forms/commentform.class.php:57
 #: ../../posts/comments/out/commentdocument.class.php:74
 msgid "Message"
 msgstr "Bericht"
 
-#: ../../posts/comments/forms/commentform.class.php:62
+#: ../../posts/comments/forms/commentform.class.php:58
+msgid "Your message"
+msgstr "Uw bericht"
+
+#: ../../posts/comments/forms/commentform.class.php:66
 #: ../../posts/comments/out/commentformdocument.class.php:52
 msgid "Post comment"
-msgstr "Reactie"
+msgstr "Plaats reactie"
 
 #: ../../posts/comments/out/commentdocument.class.php:71
 msgid "URL"
