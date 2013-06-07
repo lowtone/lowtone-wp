@@ -33,7 +33,8 @@ class PostDocument extends ObjectDocument implements WpDocument {
 		BUILD_ADJACENT = "build_adjacent",
 		ADJACENT_DOCUMENT_OPTIONS = "adjacent_document_options",
 		OPTION_ADJACENT = "adjacent",
-		USE_TEMPLATE_FUNCTIONS = "use_template_functions";
+		USE_TEMPLATE_FUNCTIONS = "use_template_functions",
+		EXCERPT_LENGTH = "excerpt_length";
 	
 	public function __construct(Post $post) {
 		parent::__construct($post);
@@ -67,7 +68,15 @@ class PostDocument extends ObjectDocument implements WpDocument {
 			if (!$document->getBuildOption(PostDocument::USE_TEMPLATE_FUNCTIONS))
 				return $excerpt;
 
-			return apply_filters("post_document_excerpt", Util::catchOutput("the_excerpt"));
+			if ($setExcerptLength = is_numeric($excerptLength = $document->getBuildOption(PostDocument::EXCERPT_LENGTH)))
+				add_filter("excerpt_length", function() use ($excerptLength) {return $excerptLength;}, 99999999);
+
+			$excerpt = apply_filters("post_document_excerpt", Util::catchOutput("the_excerpt"));
+
+			if ($setExcerptLength)
+				remove_filter("excerpt_length", 99999999);
+
+			return $excerpt;
 		};
 		
 		$this->updateBuildOptions(array(
