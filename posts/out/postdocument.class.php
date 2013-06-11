@@ -68,13 +68,13 @@ class PostDocument extends ObjectDocument implements WpDocument {
 			if (!$document->getBuildOption(PostDocument::USE_TEMPLATE_FUNCTIONS))
 				return $excerpt;
 
-			if ($setExcerptLength = is_numeric($excerptLength = $document->getBuildOption(PostDocument::EXCERPT_LENGTH)))
-				add_filter("excerpt_length", function() use ($excerptLength) {return $excerptLength;}, 99999999);
+			if ($setExcerptLength = is_numeric($document->excerptLength()))
+				add_filter("excerpt_length", array($document, "excerptLength"), 99999999);
 
 			$excerpt = apply_filters("post_document_excerpt", Util::catchOutput("the_excerpt"));
 
 			if ($setExcerptLength)
-				remove_filter("excerpt_length", 99999999);
+				remove_filter("excerpt_length", array($document, "excerptLength"), 99999999);
 
 			return $excerpt;
 		};
@@ -306,6 +306,10 @@ class PostDocument extends ObjectDocument implements WpDocument {
 		$properties["permalink"] = get_permalink();
 
 		return $properties;
+	}
+
+	public function excerptLength() {
+		return $this->getBuildOption(PostDocument::EXCERPT_LENGTH);
 	}
 	
 }
