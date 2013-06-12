@@ -17,6 +17,8 @@ class MetaDocument extends ObjectDocument implements WpDocument {
 	public function __construct($meta) {
 		parent::__construct(new Meta($meta));
 
+		$document = $this;
+
 		$this->updateBuildOptions(array(
 				self::BUILD_ATTRIBUTES => array(
 						Meta::PROPERTY_META_ID,
@@ -28,18 +30,27 @@ class MetaDocument extends ObjectDocument implements WpDocument {
 					),
 				self::STRIP_PROPERTY_PREFIX => "meta_",
 				self::PROPERTY_FILTERS => array(
-						Meta::PROPERTY_META_VALUE => function($value) {
+						Meta::PROPERTY_META_VALUE => function($value) use ($document) {
 							if (is_array($value)) {
 
-								// Rename numeric keys
+								if ($value) {
 
-								$value = \lowtone\types\arrays\XArray::mapKeys(function($value) {
-									if (!Element::validateName($value)) 
-										$value = Element::normalizeName($value);
+									$value = array_map(function($name, $value) use ($document) {
+										if (!Element::validateName($name)) {
+											$atts = array(
+													"key" => $name
+												);
 
-									return $value;
-								}, $value);
+											$element = $document->createElement("invalid_key_element", $value)->setAttributes($atts);
+										} else 
+											$element = $document->createElement($name, $value);
 
+										return $element;
+									}, array_keys($value), $value);
+
+								} else
+									$value = NULL;
+								
 							}
 
 							return $value;
