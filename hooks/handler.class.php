@@ -41,16 +41,34 @@ abstract class Handler {
 
 		$hooks = array();
 
+		$priorities = (array) $this->__priorities();
+
 		foreach ($rc->getMethods() as $method) {
 			if ("_" == $method->name[0])
 				continue;
 
-			$func($method->name, $this, $priority, $method->getNumberOfParameters());
+			$p = isset($priorities[$method->name]) ? $priorities[$method->name] : $priority;
+
+			/*
+			 * The Handler instance is added callback hook, not a direct 
+			 * reference to the method, because the instance has access to 
+			 * protected methods through its public __invoke() method.
+			 */
+
+			$func($method->name, $this, $p, $method->getNumberOfParameters());
 
 			$hooks[] = $method->name;
 		}
 
 		return $hooks;
+	}
+
+	/**
+	 * Provide a custom list off priorities for each hook.
+	 * @return array Returns a list of hook names and their priorities.
+	 */
+	public function __priorities() {
+		return array();
 	}
 
 }
