@@ -18,7 +18,6 @@ class Pagination extends \lowtone\ui\pagination\Pagination {
 	
 	public function __construct(Query $query) {
 		$this->itsQuery = $query;
-		
 	}
 	
 	// Getters
@@ -32,19 +31,19 @@ class Pagination extends \lowtone\ui\pagination\Pagination {
 	}
 	
 	public function getCurrent() {
-		return $this->itsQuery->getQueryVar("paged") ?: 1;
+		return $this->itsQuery->qvar("paged") ?: 1;
 	}
 	
 	public function getTotal() {
-		return $this->itsQuery->getMaxNumPages();
+		return $this->itsQuery->{Query::PROPERTY_MAX_NUM_PAGES};
 	}
 	
 	public function getItemsPerPage() {
-		return $this->itsQuery->getPostCount();
+		return $this->itsQuery->{Query::PROPERTY_POST_COUNT};
 	}
 	
 	public function getTotalItems() {
-		return $this->itsQuery->getFoundPosts();
+		return $this->itsQuery->{Query::PROPERTY_FOUND_POSTS};
 	}
 	
 }

@@ -85,7 +85,7 @@ class QueryDocument extends ObjectDocument {
 				
 		}
 		
-		if ($this->getBuildOption(self::BUILD_PAGINATION) && $this->itsQuery->getMaxNumPages() > 1) {
+		if ($this->getBuildOption(self::BUILD_PAGINATION) && $this->itsQuery->{Query::PROPERTY_MAX_NUM_PAGES} > 1) {
 			$paginationDocument = new PaginationDocument(new Pagination($this->itsQuery));
 			
 			$paginationDocument->build($this->getBuildOption(self::PAGINATION_DOCUMENT_OPTIONS));
