@@ -1,7 +1,8 @@
 <?php
 namespace lowtone\wp\posts\collections\out;
 use lowtone\types\objects\collections\out\CollectionDocument as Base,
-	lowtone\wp\posts\Post;
+	lowtone\wp\posts\Post,
+	lowtone\wp\posts\collections\Collection;
 
 /**
  * @author Paul van der Meijs <code@paulvandermeijs.nl>
@@ -12,30 +13,6 @@ use lowtone\types\objects\collections\out\CollectionDocument as Base,
  */
 class CollectionDocument extends Base {
 	
-	/*const POST_LIST_ELEMENT_NAME = "object_list_element_name",
-		POST_DOCUMENT_OPTIONS = "object_document_options";
-
-	public function __construct(array $posts) {
-		parent::__construct($posts);
-
-		$this->updateBuildOptions(array(
-				self::TO_OBJECT => function($object) {
-					if ($object instanceof Post)
-						return $object;
-
-					return Post::create($object);
-				}
-			));
-	}
-	
-	public function updateBuildOptions(array $options) {
-		parent::updateBuildOptions($options);
-		
-		return $this->transferBuildOptions(self::POST_DOCUMENT_OPTIONS, array(
-			PostDocument::BUILD_LOCALES => $this->getBuildOption(self::BUILD_LOCALES)
-		));
-	}*/
-	
 	public function build(array $options = NULL) {
 		parent::build($options);
 
@@ -44,12 +21,22 @@ class CollectionDocument extends Base {
 		// Locales
 		
 		if ($this->getBuildOption(self::BUILD_LOCALES)) {
-			
-			$collectionElement
-				->appendCreateElement("locales", array(
+			$locales = array(
 					"title" => __("Posts", "lowtone_wp"),
 					"no_posts" => __("No posts.", "lowtone_wp")
-				));
+				);
+
+			if (NULL !== ($postType = get_post_type_object($this->itsCollection->postType()))) {
+
+				$locales = array_merge($locales, array_filter(array(
+						"title" => $postType->labels->name,
+						"no_posts" => $postType->labels->not_found
+					)));
+
+			}
+			
+			$collectionElement
+				->appendCreateElement("locales", $locales);
 			
 		}
 		

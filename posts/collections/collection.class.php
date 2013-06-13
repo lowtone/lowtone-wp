@@ -19,6 +19,17 @@ class Collection extends Base {
 		return parent::offsetGet($index);
 	}
 
+	public function postType() {
+		foreach ($this as $object) {
+			if (!($object instanceof Post))
+				continue;
+
+			return $object->{Post::PROPERTY_POST_TYPE};
+		}
+
+		return NULL;
+	}
+
 	// Static
 
 	public static function __getObjectClass() {

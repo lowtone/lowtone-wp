@@ -1,8 +1,7 @@
 <?php
 namespace lowtone\wp\queries\out;
-use lowtone\dom\Document,
+use lowtone\types\objects\out\ObjectDocument,
 	lowtone\ui\pagination\out\PaginationDocument,
-	lowtone\wp\posts\out\PostListDocument,
 	lowtone\wp\queries\Query,
 	lowtone\wp\queries\pagination\Pagination;
 
@@ -13,7 +12,7 @@ use lowtone\dom\Document,
  * @version 1.1
  * @package wordpress\libs\lowtone\wp\queries\out
  */
-class QueryDocument extends Document {
+class QueryDocument extends ObjectDocument {
 	
 	/**
 	 * @var Query
@@ -21,14 +20,31 @@ class QueryDocument extends Document {
 	protected $itsQuery;
 	
 	const BUILD_POSTS = "build_posts",
-		POST_LIST_DOCUMENT_OPTIONS = "post_list_document_options",
+		POST_COLLECTION_DOCUMENT_OPTIONS = "post_collection_document_options",
 		BUILD_PAGINATION = "build_pagination",
 		PAGINATION_DOCUMENT_OPTIONS = "pagination_document_options";
 	
 	public function __construct(Query $query) {
-		parent::__construct();
+		parent::__construct($query);
 		
 		$this->itsQuery = $query;
+
+		$this->updateBuildOptions(array(
+				self::BUILD_ELEMENTS => array(
+					Query::PROPERTY_QUERY_VARS,
+					Query::PROPERTY_POST_COUNT,
+					Query::PROPERTY_FOUND_POSTS,
+					Query::PROPERTY_MAX_NUM_PAGES,
+					Query::PROPERTY_CURRENT_POST,
+				),
+				self::PROPERTY_FILTERS => array(
+					Query::PROPERTY_QUERY_VARS => function($value) {
+						return array_filter($value, function($var) {
+							return $var || is_numeric($var);
+						});
+					}
+				)
+			));
 
 		// Set element name filter to handle numeric query vars
 
@@ -46,21 +62,11 @@ class QueryDocument extends Document {
 	}
 	
 	public function build(array $options = NULL) {
-		$this->updateBuildOptions((array) $options);
+		parent::build($options);
 
-		$queryVars = array_filter($this->itsQuery->getQueryVars(), function($value) {
-			return $value || is_numeric($value);
-		});
+		$queryElement = $this->documentElement;
 		
-		$queryElement = $this->createAppendElement("query", array(
-			"query_vars" => $queryVars,
-			"post_count" => $this->itsQuery->getPostCount(),
-			"found_posts" => $this->itsQuery->getFoundPosts(),
-			"max_num_pages" => $this->itsQuery->getMaxNumPages(),
-			"current_post" => $this->itsQuery->getCurrentPost()
-		));
-		
-		foreach ($this->itsQuery->getContext() as $context) {
+		foreach ($this->itsQuery->context() as $context) {
 			if (is_numeric($context))
 				$context = "is_" . $context; // @todo Numeric values can't be attribute names, change this.
 
@@ -68,12 +74,14 @@ class QueryDocument extends Document {
 		}
 		
 		if ($this->getBuildOption(self::BUILD_POSTS)) {
-			$postListDocument = new PostListDocument($this->itsQuery->getPosts());
+			$postCollectionDocument = $this
+				->itsQuery
+				->posts()
+				->createDocument()
+				->build((array) $this->getBuildOption(self::POST_COLLECTION_DOCUMENT_OPTIONS));
 			
-			$postListDocument->build($this->getBuildOption(self::POST_LIST_DOCUMENT_OPTIONS));
-			
-			if ($postListElement = $this->importDocument($postListDocument))
-				$queryElement->appendChild($postListElement);
+			if ($postCollectionElement = $this->importDocument($postCollectionDocument))
+				$queryElement->appendChild($postCollectionElement);
 				
 		}
 		

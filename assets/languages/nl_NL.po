@@ -1,8 +1,8 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: WordPress Library\n"
-"POT-Creation-Date: 2013-06-06 17:29+0100\n"
-"PO-Revision-Date: 2013-06-06 17:29+0100\n"
+"POT-Creation-Date: 2013-06-13 14:20+0100\n"
+"PO-Revision-Date: 2013-06-13 14:20+0100\n"
 "Last-Translator: Paul van der Meijs <info@lowtone.nl>\n"
 "Language-Team: Lowtone <info@lowtone.nl>\n"
 "Language: Dutch\n"
@@ -15,19 +15,17 @@ msgstr ""
 "X-Poedit-SourceCharset: UTF-8\n"
 "X-Poedit-SearchPath-0: ../..\n"
 
-#: ../../posts/collections/out/collectiondocument.class.php:50
-#: ../../posts/out/postlistdocument.class.php:50
+#: ../../posts/collections/out/collectiondocument.class.php:25
 msgid "Posts"
 msgstr "Berichten"
 
-#: ../../posts/collections/out/collectiondocument.class.php:51
-#: ../../posts/out/postlistdocument.class.php:51
+#: ../../posts/collections/out/collectiondocument.class.php:26
 msgid "No posts."
 msgstr "Geen berichten."
 
 #: ../../posts/comments/forms/commentform.class.php:21
 #: ../../posts/comments/out/commentdocument.class.php:69
-#: ../../posts/out/postdocument.class.php:283
+#: ../../posts/out/postdocument.class.php:292
 msgid "Author"
 msgstr "Auteur"
 
@@ -108,30 +106,30 @@ msgstr "Reacties op dit bericht"
 msgid "No comments."
 msgstr "Geen reacties."
 
-#: ../../posts/out/postdocument.class.php:148
+#: ../../posts/out/postdocument.class.php:157
 msgid "Extra fields"
 msgstr "Extra velden"
 
-#: ../../posts/out/postdocument.class.php:149
+#: ../../posts/out/postdocument.class.php:158
 msgid "No extra fields."
 msgstr "Geen extra velden"
 
-#: ../../posts/out/postdocument.class.php:256
+#: ../../posts/out/postdocument.class.php:265
 msgid "Previous post"
 msgstr "Vorige bericht"
 
-#: ../../posts/out/postdocument.class.php:267
+#: ../../posts/out/postdocument.class.php:276
 msgid "Next post"
 msgstr "Volgende bericht"
 
-#: ../../posts/out/postdocument.class.php:281
+#: ../../posts/out/postdocument.class.php:290
 msgid "Date"
 msgstr "Datum"
 
-#: ../../posts/out/postdocument.class.php:282
+#: ../../posts/out/postdocument.class.php:291
 msgid "Last modified"
 msgstr "Laatste wijziging"
 
-#: ../../posts/out/postdocument.class.php:284
+#: ../../posts/out/postdocument.class.php:293
 msgid "Read more"
 msgstr "Lees meer"

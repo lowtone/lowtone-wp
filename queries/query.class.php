@@ -2,7 +2,8 @@
 namespace lowtone\wp\queries;
 use WP_Query,
 	lowtone\types\objects\Object,
-	lowtone\wp\posts\Post;
+	lowtone\wp\posts\Post,
+	lowtone\wp\pages\Page;
 
 /**
  * @author Paul van der Meijs <code@paulvandermeijs.nl>
@@ -60,6 +61,8 @@ class Query extends Object {
 		PROPERTY_QUERY_VARS_CHANGED = "query_vars_changed",
 		PROPERTY_THUMBNAILS_CACHED = "thumbnails_cached",
 		PROPERTY_QUERY = "query",
+		PROPERTY_QUERIED_OBJECT = "queried_object",
+		PROPERTY_QUERIED_OBJECT_ID = "queried_object_id",
 		PROPERTY_REQUEST = "request",
 		PROPERTY_POSTS = "posts",
 		PROPERTY_POST = "post";
@@ -90,9 +93,7 @@ class Query extends Object {
 		
 	}
 	
-	// Getters
-	
-	public function getContext() {
+	public function context() {
 		return array_keys(array_filter(array(
 			self::CONTEXT_404 => $this->itsQuery->is_404(),
 			self::CONTEXT_SEARCH => $this->itsQuery->is_search(),
@@ -112,27 +113,46 @@ class Query extends Object {
 		)));
 	}
 	
-	public function getQueryVar($var) {
+	/**
+	 * Get a query var from the WordPress query object.
+	 * @param string $var The name of the required variable.
+	 * @return mixed Returns the value for the required variable.
+	 */
+	public function qvar($var) {
 		return $this->itsQuery->get($var);
 	}
-	
-	public function getQuery() {return $this->itsQuery;}
-	
-	public function getQueryString() {return $this->itsQuery->query;}
-	public function getQueryVars() {return $this->itsQuery->query_vars;}
-	public function getQueriedObject() {return $this->itsQuery->queried_object;}
-	public function getQueriedObjectId() {return $this->itsQuery->queried_object_id;}
 
-	public function getPosts() {
-		return array_map(function($post) {
-			return Post::create($post);
-		}, $this->itsQuery->posts);
+	public function postType() {
+		if ($postType = trim($this->qvar("post_type")))
+			return $postType;
+
+		if (($queriedObject = $this->{self::PROPERTY_QUERIED_OBJECT}) instanceof \WP_Post) 
+			return $queriedObject->{Post::PROPERTY_POST_TYPE};
+
+		return Post::__postType();
 	}
 
-	public function getPostCount() {return $this->itsQuery->post_count;}
-	public function getFoundPosts() {return $this->itsQuery->found_posts;}
-	public function getMaxNumPages() {return $this->itsQuery->max_num_pages;}
-	public function getCurrentPost() {return $this->itsQuery->current_post;}
-	public function getPost() {return $this->itsQuery->post;}
+	public function posts() {
+		$postClass =  "lowtone\\wp\\posts\\Post";
+
+		if (NULL != ($postType = get_post_type_object(self::postType()))) {
+
+			if (isset($postType->post_class))
+				$postClass = $postType->post_class;
+			else if (Page::__postType() == $postType->name)
+				$postClass = "lowtone\\wp\\pages\\Page";
+
+		}
+		
+		return $postClass::__createCollection($this->itsQuery->posts);
+	}
+	
+	/**
+	 * Get the original WordPress query object.
+	 * @return WP_Query Return the original WordPress query object.
+	 */
+	public function __getQuery() {
+		return $this->itsQuery;
+	}
 	
 }
