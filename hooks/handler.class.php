@@ -12,6 +12,8 @@ use ReflectionClass,
  */
 abstract class Handler {
 
+	private static $__added = array();
+
 	public function __invoke() {
 		global $wp_current_filter;
 
@@ -34,7 +36,10 @@ abstract class Handler {
 	 * filter since WordPress adds actions as filters anyway.
 	 * @return array Returns a list of added hooks.
 	 */
-	public function __add($priority = 10, $type = "filter") {
+	public function __add($priority = 10, $type = "filter", &$hooks = NULL) {
+		if (($maxAdds = $this->__maxAdds()) > -1 && $this->__added() >= $maxAdds)
+			return $this;
+
 		$rc = new ReflectionClass(get_called_class());
 
 		$func = "add_{$type}";
@@ -43,7 +48,10 @@ abstract class Handler {
 
 		$priorities = (array) $this->__priorities();
 
-		foreach ($rc->getMethods() as $method) {
+		foreach ($rc->getMethods(ReflectionMethod::IS_PUBLIC | ReflectionMethod::IS_PROTECTED) as $method) {
+			if ($method->isStatic())
+				continue;
+
 			if ("_" == $method->name[0])
 				continue;
 
@@ -60,7 +68,25 @@ abstract class Handler {
 			$hooks[] = $method->name;
 		}
 
-		return $hooks;
+		self::$__added[$class = get_called_class()] = isset(self::$__added[$class]) ? ++self::$__added[$class] : 1;
+
+		return $this;
+	}
+
+	/**
+	 * Get the number of times hooks where regeistered for the called class.
+	 * @return int Returns the number of times Handler::__add() was called.
+	 */
+	public function __added() {
+		return isset(self::$__added[$class = get_called_class()]) ? (int) self::$__added[$class] : 0;
+	}
+
+	/**
+	 * Get the maximum number of times hooks can be added for the called class.
+	 * @return int Returns the maximum number of times hooks can be added.
+	 */
+	public function __maxAdds() {
+		return 1;
 	}
 
 	/**
