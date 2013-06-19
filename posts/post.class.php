@@ -617,11 +617,17 @@ class Post extends Record implements interfaces\Post, interfaces\Registrable {
 		return $result;
 	}
 
-	public static function __registerPostClass($postType, $class) {
+	public static function __registerPostClass($postType = NULL, $class = NULL) {
 		global $wp_post_types;
+
+		if (!isset($postType))
+			$postType = self::__postType();
 
 		if (!isset($wp_post_types[$postType]))
 			return false;
+
+		if (!isset($class))
+			$class = get_called_class();
 
 		$wp_post_types[$postType]->{self::OPTION_POST_CLASS} = $class;
 

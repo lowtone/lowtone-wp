@@ -23,6 +23,12 @@ class Attachment extends Post {
 		return get_post_meta($this->getPostId(), self::META_ATTACHED_FILE, true);
 	}
 
+	public function getAttachedFileUrl() {
+		$uploadDir = wp_upload_dir();
+
+		return $uploadDir["baseurl"] . "/" . $this->getAttachedFile();
+	}
+
 	public function getAttachmentMetadata() {
 		return get_post_meta($this->getPostId(), self::META_ATTACHMENT_METADATA, true);
 	}
