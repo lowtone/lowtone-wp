@@ -11,6 +11,7 @@ use ErrorException,
 	lowtone\db\records\schemata\properties\types\DateTime as DateTimeProperty,
 	lowtone\db\records\schemata\properties\types\Int as IntProperty,
 	lowtone\db\records\schemata\properties\types\String as StringProperty,
+	lowtone\io\File,
 	lowtone\net\URL,
 	lowtone\types\datetime\DateTime,
 	lowtone\wp\taxonomies\Taxonomy,
@@ -272,6 +273,51 @@ class Post extends Record implements interfaces\Post, interfaces\Registrable {
 	}
 
 	// Attachments
+
+	public function thumbnail($thumbnail = NULL) {
+		if (!isset($thumbnail)) {
+			if (!($thumbnailId = get_post_thumbnail_id($this->{self::PROPERTY_ID})))
+				return false;
+
+			if (!($post = get_post($thumbnailId)))
+				return false;
+
+			return new thumbnails\Thumbnail($post);
+		}
+
+		if (is_numeric($thumbnail)) {
+
+			if (!($thumbnail = get_post($thumbnail)))
+				throw new \ErrorException("Resource not found");
+
+		} else {
+
+			if (is_string($thumbnail)) 
+				$thumbnail = File::get($thumbnail);
+
+			if ($thumbnail instanceof File) {
+
+				$uploadDir = wp_upload_dir($this->{self::PROPERTY_POST_DATE}->format("Y/m"));
+
+				$thumbnail->put($uploadDir["path"] . DIRECTORY_SEPARATOR . basename($thumbnail->url()->path));
+
+				// Create the thumbnail
+
+			}
+		}
+
+		$thumbnail = (object) $thumbnail;
+
+		if (!isset($thumbnail->{self::PROPERTY_ID}))
+			throw new \ErrorException("Not a valid thumbnail");
+
+		if (!(isset($thumbnail->{self::PROPERTY_POST_TYPE}) && "attachment" == $thumbnail->{self::PROPERTY_POST_TYPE}))
+			throw new \ErrorException("Not a valid thumbnail");
+
+		// Set the thumbnail
+
+		return $this;
+	}
 	
 	public function getPostThumbnail() {
 		if (!($thumbnailId = get_post_thumbnail_id($this->getPostId())))
