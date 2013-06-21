@@ -297,10 +297,6 @@ class Post extends Record implements interfaces\Post, interfaces\Registrable {
 
 			if ($thumbnail instanceof File) {
 
-				$uploadDir = wp_upload_dir($this->{self::PROPERTY_POST_DATE}->format("Y/m"));
-
-				$thumbnail->put($uploadDir["path"] . DIRECTORY_SEPARATOR . basename($thumbnail->url()->path));
-
 				// Create the thumbnail
 
 			}

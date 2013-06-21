@@ -1,6 +1,9 @@
 <?php
 namespace lowtone\wp\attachments;
-use lowtone\wp\posts\Post;
+use lowtone\net\URL,
+	lowtone\io\File,
+	lowtone\wp\posts\Post,
+	lowtone\types\datetime\DateTime;
 
 /**
  * @author Paul van der Meijs <code@lowtone.nl>
@@ -61,6 +64,18 @@ class Attachment extends Post {
 
 	public static function __getDocumentClass() {
 		return "lowtone\\wp\\attachments\\out\\AttachmentDocument";
+	}
+
+	public static function fromUrl($url) {
+		$file = File::get($url);
+
+		return static::fromFile($file);
+	}
+
+	public static function fromFile(File $file) {
+		$uploadDir = wp_upload_dir(DateTime::now()->format("Y/m"));
+
+		$file->put($uploadDir["path"] . DIRECTORY_SEPARATOR . basename($file->url()->{URL::PROPERTY_PATH}));
 	}
 	
 }
