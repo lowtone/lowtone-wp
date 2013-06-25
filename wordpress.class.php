@@ -17,5 +17,25 @@ class WordPress {
 	public function context() {
 		return self::query()->context();
 	}
+
+	public function doingCron() {
+		return defined("DOING_CRON") && DOING_CRON;
+	}
+
+	public function doingAutosave() {
+		return defined("DOING_AUTOSAVE") && DOING_AUTOSAVE;
+	}
+
+	public function doingAjax() {
+		return defined("DOING_AJAX") && DOING_AJAX;
+	}
+	
+	public function isDebug() {
+		return defined("WP_DEBUG") && WP_DEBUG;
+	}
+
+	public function isScriptDebug() {
+		return defined("SCRIPT_DEBUG") && SCRIPT_DEBUG;
+	}
 	
 }
