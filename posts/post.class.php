@@ -311,6 +311,8 @@ class Post extends Record implements interfaces\Post, interfaces\Registrable {
 			throw new \ErrorException("Not a valid thumbnail");
 
 		// Set the thumbnail
+		
+		update_post_meta($this->{Post::PROPERTY_ID}, self::META_THUMBNAIL_ID, $thumbnail->{self::PROPERTY_ID});
 
 		return $this;
 	}
