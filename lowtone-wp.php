@@ -12,32 +12,41 @@
 
 namespace lowtone\wp {
 
-	use lowtone\Util;
+	use lowtone\content\packages\Package;
+
+	// Includes
 	
-	if (!class_exists("lowtone\\Lowtone"))
-		return;
+	if (!include_once WP_PLUGIN_DIR . "/lowtone-content/lowtone-content.php") 
+		return trigger_error("Lowtone Content plugin is required", E_USER_ERROR) && false;
 
-	
-	Util::addMergedPath(__NAMESPACE__);
-	 
-	Util::call(function() {
+	$__i = Package::init(array(
+			Package::INIT_PACKAGES => array("lowtone"),
+			Package::INIT_MERGED_PATH => __NAMESPACE__,
+			Package::INIT_SUCCESS => function() {
 
-		// Admin notices
-		
-		admin\notices\Notice::init();
+				// Fix WordPress
+				
+				include_once "inc/fixes.inc.php";
 
-		// Load text domain
-		
-		$loadTextDomain = function() {
-			if (is_textdomain_loaded("lowtone_wp"))
-				return;
+				// Admin notices
+				
+				admin\notices\Notice::init();
 
-			load_textdomain("lowtone_wp", __DIR__ . "/assets/languages/" . get_locale() . ".mo");
-		};
+				// Load text domain
+				
+				$loadTextDomain = function() {
+					if (is_textdomain_loaded("lowtone_wp"))
+						return;
 
-		add_action("plugins_loaded", $loadTextDomain);
+					load_textdomain("lowtone_wp", __DIR__ . "/assets/languages/" . get_locale() . ".mo");
+				};
 
-		add_action("after_setup_theme", $loadTextDomain);
-	});
+				add_action("plugins_loaded", $loadTextDomain);
+
+				add_action("after_setup_theme", $loadTextDomain);
+
+				return true;
+			}
+		));
 	
 }
