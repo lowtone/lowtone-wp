@@ -14,6 +14,7 @@ use ErrorException,
 	lowtone\io\File,
 	lowtone\net\URL,
 	lowtone\types\datetime\DateTime,
+	lowtone\wp\attachments\Attachment,
 	lowtone\wp\taxonomies\Taxonomy,
 	lowtone\wp\terms\Term,
 	lowtone\wp\posts\comments\Comment,
@@ -288,7 +289,7 @@ class Post extends Record implements interfaces\Post, interfaces\Registrable {
 		if (is_numeric($thumbnail)) {
 
 			if (!($thumbnail = get_post($thumbnail)))
-				throw new \ErrorException("Resource not found");
+				throw new exceptions\ThumbnailException("Resource not found");
 
 		} else {
 
@@ -298,17 +299,27 @@ class Post extends Record implements interfaces\Post, interfaces\Registrable {
 			if ($thumbnail instanceof File) {
 
 				// Create the thumbnail
+				
+				$uploadDir = wp_upload_dir($this->{self::PROPERTY_POST_DATE}->format("Y/m"));
+				
+				$thumbnail = Attachment::fromFile($thumbnail, array(
+						"target" => $uploadDir["path"] . "/" . $this->{self::PROPERTY_POST_NAME} . "." . $thumbnail->url()->pathinfo(PATHINFO_EXTENSION),
+						"defaults" => array(
+							self::PROPERTY_POST_TITLE => $this->{self::PROPERTY_POST_TITLE},
+							self::PROPERTY_POST_PARENT => $this->{self::PROPERTY_ID}
+						)
+					));
 
 			}
 		}
 
-		$thumbnail = (object) $thumbnail;
+		$thumbnail = (object) (array) $thumbnail;
 
 		if (!isset($thumbnail->{self::PROPERTY_ID}))
-			throw new \ErrorException("Not a valid thumbnail");
+			throw new exceptions\ThumbnailException("Not a valid thumbnail");
 
-		if (!(isset($thumbnail->{self::PROPERTY_POST_TYPE}) && "attachment" == $thumbnail->{self::PROPERTY_POST_TYPE}))
-			throw new \ErrorException("Not a valid thumbnail");
+		if (!(isset($thumbnail->{self::PROPERTY_POST_TYPE}) && Attachment::__postType() == $thumbnail->{self::PROPERTY_POST_TYPE}))
+			throw new exceptions\ThumbnailException("Not a valid thumbnail");
 
 		// Set the thumbnail
 		
