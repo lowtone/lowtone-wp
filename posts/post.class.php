@@ -18,7 +18,9 @@ use ErrorException,
 	lowtone\wp\taxonomies\Taxonomy,
 	lowtone\wp\terms\Term,
 	lowtone\wp\posts\comments\Comment,
-	lowtone\wp\posts\meta\Meta;
+	lowtone\wp\posts\exceptions\ThumbnailException,
+	lowtone\wp\posts\meta\Meta,
+	lowtone\wp\posts\thumbnails\Thumbnail;
 
 /**
  * Post
@@ -56,7 +58,7 @@ use ErrorException,
  * @author Paul van der Meijs <code@lowtone.nl>
  * @copyright Copyright (c) 2011-2012, Paul van der Meijs
  * @license http://wordpress.lowtone.nl/license/
- * @version 1.0
+ * @version 1.1
  * @package wordpress\libs\lowtone\wp\posts
  */
 class Post extends Record implements interfaces\Post, interfaces\Registrable {
@@ -80,6 +82,8 @@ class Post extends Record implements interfaces\Post, interfaces\Registrable {
 	 * @var Collection
 	 */
 	protected $itsComments;
+
+	// Properties
 	
 	const PROPERTY_ID = "ID",
 		PROPERTY_POST_AUTHOR = "post_author",
@@ -107,6 +111,8 @@ class Post extends Record implements interfaces\Post, interfaces\Registrable {
 		PROPERTY_ANCESTORS = "ancestors",
 		PROPERTY_FILTER = "filter";
 
+	// Post statusus
+
 	const STATUS_PUBLISH = "publish",
 		STATUS_PENDING = "pending",
 		STATUS_DRAFT = "draft",
@@ -120,6 +126,8 @@ class Post extends Record implements interfaces\Post, interfaces\Registrable {
 		STATUS_OPEN = "open",
 		STATUS_CLOSED = "closed",
 		STATUS_REGISTERED_ONLY = "registered_only";
+
+	// Post meta keys
 
 	const META_THUMBNAIL_ID = "_thumbnail_id";
 	
@@ -149,10 +157,10 @@ class Post extends Record implements interfaces\Post, interfaces\Registrable {
 	 * @throws ErrorException Throws an exception if either no ID property is 
 	 * defined or WordPress failed to load the properties for a post with the 
 	 * specified ID.
-	 * @return Post Returns the Post object on success. 
+	 * @return Post Returns the Post object for method chaining on success.
 	 */
 	public function load() {
-		if (!is_numeric($postId = $this->getPostId())) 
+		if (!is_numeric($postId = $this->{self::PROPERTY_ID})) 
 			throw new ErrorException("Failed to load a Post without a numeric ID", 0, E_NOTICE);
 		
 		if (is_null($post = get_post($postId, ARRAY_A))) 
@@ -167,10 +175,10 @@ class Post extends Record implements interfaces\Post, interfaces\Registrable {
 	 * Load the meta for the Post object.
 	 * @throws ErrorException Throws an exception if the ID property isn't 
 	 * defined.
-	 * @return Post Returns the Post object on success.
+	 * @return Post Returns the Post object for method chaining on success.
 	 */
 	public function loadMeta() {
-		if (!is_numeric($postId = $this->getPostId())) 
+		if (!is_numeric($postId = $this->{self::PROPERTY_ID})) 
 			throw new ErrorException("Failed to load Meta for a Post without a numeric ID", 0, E_NOTICE);
 		
 		$this->itsMeta = Meta::find(array(
@@ -180,9 +188,13 @@ class Post extends Record implements interfaces\Post, interfaces\Registrable {
 		return $this;
 	}
 
+	/**
+	 * Load taxonomies for the Post's post type.
+	 * @return Post Returns the Post object for method chaining on success.
+	 */
 	public function loadTaxonomies() {
 		$taxonomies = get_taxonomies(array(
-					"object_type" => array($this->getPostType())
+					"object_type" => array($this->{self::PROPERTY_POST_TYPE})
 				), "objects");
 
 		$this->setTaxonomies($taxonomies);
@@ -190,12 +202,16 @@ class Post extends Record implements interfaces\Post, interfaces\Registrable {
 		return $this;
 	}
 	
+	/**
+	 * Load the terms related to the Post.
+	 * @return Post Returns the Post object for method chaining on success.
+	 */
 	public function loadTerms() {
-		if (!is_numeric($postId = $this->getPostId())) 
+		if (!is_numeric($postId = $this->{self::PROPERTY_ID})) 
 			throw new ErrorException("Failed to load tags for a Post without a numeric ID", 0, E_NOTICE);
 
 		$taxonomies = array_map(function($taxonomy) {
-			return $taxonomy->getName();
+			return $taxonomy->{Taxonomy::PROPERTY_NAME};
 		}, $this->getTaxonomies()->getObjects());
 
 		$taxonomies = array_values($taxonomies);
@@ -213,10 +229,10 @@ class Post extends Record implements interfaces\Post, interfaces\Registrable {
 	 * @param array|NULL $options An optional list of load options.
 	 * @throws ErrorException Throws an exception if the ID property isn't 
 	 * defined.
-	 * @return Post Returns the Post object on success.
+	 * @return Post Returns the Post object for method chaining on success.
 	 */
 	public function loadComments(array $options = NULL) {
-		if (!is_numeric($postId = $this->getPostId())) 
+		if (!is_numeric($postId = $this->{self::PROPERTY_ID})) 
 			throw new ErrorException("Failed to load Comments for a Post without a numeric ID", 0, E_NOTICE);
 		
 		$options = array_merge((array) $options, array(
@@ -254,27 +270,44 @@ class Post extends Record implements interfaces\Post, interfaces\Registrable {
 	 * @return Post Returns the Post object on success.
 	 */
 	public function delete() {
-		wp_delete_post($this->getPostId());
+		wp_delete_post($this->{self::PROPERTY_ID});
 		
 		return $this;
 	}
 
 	// Setup post data
 	
+	/**
+	 * Call setup_postdata for the Post.
+	 * @return Post Returns the Post instance for method chaining.
+	 */
 	public function setupPostData() {
 		setup_postdata($GLOBALS["post"] = (object) (array) $this); // Create standard object from Post
 
 		return $this;
 	}
 	
-	// Getters
-	
+	/**
+	 * Get the permalink for the post.
+	 * @return URL Returns the permalink represented as an URL instance.
+	 */
 	public function permalink() {
-		return URL::fromString(get_permalink($this->getPostId()));
+		return URL::fromString(get_permalink($this->{self::PROPERTY_ID}));
 	}
 
 	// Attachments
 
+	/**
+	 * Get or set the post thumbnail.
+	 * @param mixed $thumbnail If a valid value is provided it will be used to
+	 * set the thumbnail. If a numeric ID value, URL, or File is provided an 
+	 * attempt will be made to convert it into a valid Attachment.
+	 * @throws ThumbnailException Throws a ThumbnailException when an invalid 
+	 * value is provided.
+	 * @return Thumbnail|Post Returns the thumbnail if no new value for the 
+	 * thumbnail is provided or the Post for method chaining if a new thumbnail 
+	 * was set successfully.
+	 */
 	public function thumbnail($thumbnail = NULL) {
 		if (!isset($thumbnail)) {
 			if (!($thumbnailId = get_post_thumbnail_id($this->{self::PROPERTY_ID})))
@@ -283,15 +316,18 @@ class Post extends Record implements interfaces\Post, interfaces\Registrable {
 			if (!($post = get_post($thumbnailId)))
 				return false;
 
-			return new thumbnails\Thumbnail($post);
+			return new Thumbnail($post);
 		}
 
 		if (is_numeric($thumbnail)) {
 
 			if (!($thumbnail = get_post($thumbnail)))
-				throw new exceptions\ThumbnailException("Resource not found");
+				throw new ThumbnailException("Resource not found");
 
 		} else {
+
+			if ($thumbnail instanceof URL)
+				$thumbnail = (string) $thumbnail;
 
 			if (is_string($thumbnail)) 
 				$thumbnail = File::get($thumbnail);
@@ -316,26 +352,16 @@ class Post extends Record implements interfaces\Post, interfaces\Registrable {
 		$thumbnail = (object) (array) $thumbnail;
 
 		if (!isset($thumbnail->{self::PROPERTY_ID}))
-			throw new exceptions\ThumbnailException("Not a valid thumbnail");
+			throw new ThumbnailException("Not a valid thumbnail");
 
 		if (!(isset($thumbnail->{self::PROPERTY_POST_TYPE}) && Attachment::__postType() == $thumbnail->{self::PROPERTY_POST_TYPE}))
-			throw new exceptions\ThumbnailException("Not a valid thumbnail");
+			throw new ThumbnailException("Not a valid thumbnail");
 
 		// Set the thumbnail
 		
-		update_post_meta($this->{Post::PROPERTY_ID}, self::META_THUMBNAIL_ID, $thumbnail->{self::PROPERTY_ID});
+		update_post_meta($this->{self::PROPERTY_ID}, self::META_THUMBNAIL_ID, $thumbnail->{self::PROPERTY_ID});
 
 		return $this;
-	}
-	
-	public function getPostThumbnail() {
-		if (!($thumbnailId = get_post_thumbnail_id($this->getPostId())))
-			return false;
-
-		if (!($post = get_post($thumbnailId)))
-			return false;
-
-		return new thumbnails\Thumbnail($post);
 	}
 	
 	// Meta related
@@ -355,9 +381,7 @@ class Post extends Record implements interfaces\Post, interfaces\Registrable {
 	
 	/**
 	 * Get the Comment objects for this Post.
-	 * @param array|NULL $filter An optional filter for the returned Comment 
-	 * objects.
-	 * @return array Returns an array of Post objects.
+	 * @see Collection::find()
 	 */
 	public function getComments() {
 		if (!($this->itsComments instanceof Collection))
@@ -368,6 +392,10 @@ class Post extends Record implements interfaces\Post, interfaces\Registrable {
 	
 	// Term related
 	
+	/**
+	 * Get taxonomies related to the Post's type.
+	 * @see Collection::find()
+	 */
 	public function getTaxonomies() {
 		if (!($this->itsTaxonomies instanceof Collection)) 
 			$this->loadTaxonomies();
@@ -375,6 +403,10 @@ class Post extends Record implements interfaces\Post, interfaces\Registrable {
 		return call_user_func_array(array($this->itsTaxonomies, "find"), func_get_args());
 	}
 	
+	/**
+	 * Get terms related to the Post's type.
+	 * @see Collection::find()
+	 */
 	public function getTerms() {
 		if (!($this->itsTerms instanceof Collection))
 			$this->loadTerms();
@@ -384,6 +416,11 @@ class Post extends Record implements interfaces\Post, interfaces\Registrable {
 
 	// Adjacent Posts
 	
+	/**
+	 * Get the Post to the left and the Post to the right of the Post object.
+	 * @return array Returns an array with keys "left" and "right" for the Post 
+	 * to the left and right for the called Post object.
+	 */
 	public function getAdjacent() {
 		$postTable = new Table(Post::__getTable());
 
@@ -414,39 +451,16 @@ class Post extends Record implements interfaces\Post, interfaces\Registrable {
 
 	// Admin URL
 
+	/**
+	 * Get the admin URL for the called Post instance or for all posts when 
+	 * called statically.
+	 * @return URL Returns a URL instance.
+	 */
 	public function __adminUrl() {
 		return isset($this) && $this instanceof Post 
 			? URL::fromString(admin_url("post.php"))->query(array("post" => $this->ID, "action" => "edit"))
 			: URL::fromString(admin_url("edit.php"))->query(array("post_type" => static::__postType()));
 	}
-	
-	// Post property getters
-	
-	public function getPostId() {return $this->__get(self::PROPERTY_ID);}
-	public function getPostAuthor() {return $this->__get(self::PROPERTY_POST_AUTHOR);}
-	public function getPostDate() {return $this->__get(self::PROPERTY_POST_DATE);}
-	public function getPostDateGmt() {return $this->__get(self::PROPERTY_POST_DATE_GMT);}
-	public function getPostContent() {return $this->__get(self::PROPERTY_POST_CONTENT);}
-	public function getPostTitle() {return $this->__get(self::PROPERTY_POST_TITLE);}
-	public function getPostExcerpt() {return $this->__get(self::PROPERTY_POST_EXCERPT);}
-	public function getPostStatus() {return $this->__get(self::PROPERTY_POST_STATUS);}
-	public function getCommentStatus() {return $this->__get(self::PROPERTY_COMMENT_STATUS);}
-	public function getPingStatus() {return $this->__get(self::PROPERTY_PING_STATUS);}
-	public function getPostPassword() {return $this->__get(self::PROPERTY_POST_PASSWORD);}
-	public function getPostName() {return $this->__get(self::PROPERTY_POST_NAME);}
-	public function getToPing() {return $this->__get(self::PROPERTY_TO_PING);}
-	public function getPinged() {return $this->__get(self::PROPERTY_PINGED);}
-	public function getPostModified() {return $this->__get(self::PROPERTY_POST_MODIFIED);}
-	public function getPostModifiedGmt() {return $this->__get(self::PROPERTY_POST_MODIFIED_GMT);}
-	public function getPostContentFiltered() {return $this->__get(self::PROPERTY_POST_CONTENT_FILTERED);}
-	public function getPostParent() {return $this->__get(self::PROPERTY_POST_PARENT);}
-	public function getGuid() {return $this->__get(self::PROPERTY_GUID);}
-	public function getMenuOrder() {return $this->__get(self::PROPERTY_MENU_ORDER);}
-	public function getPostType() {return $this->__get(self::PROPERTY_POST_TYPE);}
-	public function getPostMimeType() {return $this->__get(self::PROPERTY_POST_MIME_TYPE);}
-	public function getCommentCount() {return $this->__get(self::PROPERTY_COMMENT_COUNT);}
-	public function getAncestors() {return $this->__get(self::PROPERTY_ANCESTORS);}
-	public function getFilter() {return $this->__get(self::PROPERTY_FILTER);}
 	
 	// Setters
 	
@@ -454,7 +468,8 @@ class Post extends Record implements interfaces\Post, interfaces\Registrable {
 	
 	/**
 	 * Set the Meta for the Post object.
-	 * @see MetaHandler::setMeta()
+	 * @param array|Collection $meta The new meta for the Post.
+	 * @return Post Returns the Post object for method chaining on success.
 	 */
 	public function setMeta($meta) {
 		$this->itsMeta = Meta::__createCollection($meta);
@@ -477,45 +492,28 @@ class Post extends Record implements interfaces\Post, interfaces\Registrable {
 	
 	// Term related
 	
+	/**
+	 * Set the taxonomies on the called Post object (doesn't change the taxonomy
+	 * configuration).
+	 * @param array|Collection $meta The new taxonomies for the Post.
+	 * @return Post Returns the Post object on succes.
+	 */
 	public function setTaxonomies(array $taxonomies) {
 		$this->itsTaxonomies = Taxonomy::__createCollection($taxonomies);
 
 		return $this;
 	}
 	
+	/**
+	 * Set the terms on the Post object.
+	 * @param array|Collection $meta The new terms for the Post.
+	 * @return Post Returns the Post object on succes.
+	 */
 	public function setTerms(array $terms) {
 		$this->itsTerms = Term::__createCollection($terms);
 		
 		return $this;
 	}
-	
-	// Post property setters
-	
-	public function setPostId($postId) {return $this->__set(self::PROPERTY_ID, $postId);}
-	public function setPostAuthor($postAuthor) {return $this->__set(self::PROPERTY_POST_AUTHOR, $postAuthor);}
-	public function setPostDate($postDate) {return $this->__set(self::PROPERTY_POST_DATE, $postDate);}
-	public function setPostDateGmt($postDateGmt) {return $this->__set(self::PROPERTY_POST_DATE_GMT, $postDateGmt);}
-	public function setPostContent($postContent) {return $this->__set(self::PROPERTY_POST_CONTENT, $postContent);}
-	public function setPostTitle($postTitle) {return $this->__set(self::PROPERTY_POST_TITLE, $postTitle);}
-	public function setPostExcerpt($postExcerpt) {return $this->__set(self::PROPERTY_POST_EXCERPT, $postExcerpt);}
-	public function setPostStatus($postStatus) {return $this->__set(self::PROPERTY_POST_STATUS, $postStatus);}
-	public function setCommentStatus($commentStatus) {return $this->__set(self::PROPERTY_COMMENT_STATUS, $commentStatus);}
-	public function setPingStatus($pingStatus) {return $this->__set(self::PROPERTY_PING_STATUS, $pingStatus);}
-	public function setPostPassword($postPassword) {return $this->__set(self::PROPERTY_POST_PASSWORD, $postPassword);}
-	public function setPostName($postName) {return $this->__set(self::PROPERTY_POST_NAME, $postName);}
-	public function setToPing($toPing) {return $this->__set(self::PROPERTY_TO_PING, $toPing);}
-	public function setPinged($pinged) {return $this->__set(self::PROPERTY_PINGED, $pinged);}
-	public function setPostModified($postModified) {return $this->__set(self::PROPERTY_POST_MODIFIED, $postModified);}
-	public function setPostModifiedGmt($postModifiedGmt) {return $this->__set(self::PROPERTY_POST_MODIFIED_GMT, $postModifiedGmt);}
-	public function setPostContentFiltered($postContentFiltered) {return $this->__set(self::PROPERTY_POST_CONTENT_FILTERED, $postContentFiltered);}
-	public function setPostParent($postParent) {return $this->__set(self::PROPERTY_POST_PARENT, $postParent);}
-	public function setGuid($guid) {return $this->__set(self::PROPERTY_GUID, $guid);}
-	public function setMenuOrder($menuOrder) {return $this->__set(self::PROPERTY_MENU_ORDER, $menuOrder);}
-	public function setPostType($postType) {return $this->__set(self::PROPERTY_POST_TYPE, $postType);}
-	public function setPostMimeType($postMimeType) {return $this->__set(self::PROPERTY_POST_MIME_TYPE, $postMimeType);}
-	public function setCommentCount($commentCount) {return $this->__set(self::PROPERTY_COMMENT_COUNT, $commentCount);}
-	public function setAncestors($ancestors) {return $this->__set(self::PROPERTY_ANCESTORS, $ancestors);}
-	public function setFilter($filter) {return $this->__set(self::PROPERTY_FILTER, $filter);}
 
 	// Post Type
 	
@@ -703,5 +701,83 @@ class Post extends Record implements interfaces\Post, interfaces\Registrable {
 		
 		return parent::all($options);
 	}
+
+	// Deprecated
+	
+	/**
+	 * @deprecated Since v1.1
+	 * @return [type] [description]
+	 */
+	public function getPostThumbnail() {
+		if (!($thumbnailId = get_post_thumbnail_id($this->{self::PROPERTY_ID})))
+			return false;
+
+		if (!($post = get_post($thumbnailId)))
+			return false;
+
+		return new Thumbnail($post);
+	}
+
+	/*
+	 * Both property setters and getters are deprecated since v1.1 in favor of 
+	 * direct property access (getters and setters are applied as defined in the
+	 * Schema).
+	 */
+	
+	// Post property getters
+	
+	public function getPostId() {return $this->__get(self::PROPERTY_ID);}
+	public function getPostAuthor() {return $this->__get(self::PROPERTY_POST_AUTHOR);}
+	public function getPostDate() {return $this->__get(self::PROPERTY_POST_DATE);}
+	public function getPostDateGmt() {return $this->__get(self::PROPERTY_POST_DATE_GMT);}
+	public function getPostContent() {return $this->__get(self::PROPERTY_POST_CONTENT);}
+	public function getPostTitle() {return $this->__get(self::PROPERTY_POST_TITLE);}
+	public function getPostExcerpt() {return $this->__get(self::PROPERTY_POST_EXCERPT);}
+	public function getPostStatus() {return $this->__get(self::PROPERTY_POST_STATUS);}
+	public function getCommentStatus() {return $this->__get(self::PROPERTY_COMMENT_STATUS);}
+	public function getPingStatus() {return $this->__get(self::PROPERTY_PING_STATUS);}
+	public function getPostPassword() {return $this->__get(self::PROPERTY_POST_PASSWORD);}
+	public function getPostName() {return $this->__get(self::PROPERTY_POST_NAME);}
+	public function getToPing() {return $this->__get(self::PROPERTY_TO_PING);}
+	public function getPinged() {return $this->__get(self::PROPERTY_PINGED);}
+	public function getPostModified() {return $this->__get(self::PROPERTY_POST_MODIFIED);}
+	public function getPostModifiedGmt() {return $this->__get(self::PROPERTY_POST_MODIFIED_GMT);}
+	public function getPostContentFiltered() {return $this->__get(self::PROPERTY_POST_CONTENT_FILTERED);}
+	public function getPostParent() {return $this->__get(self::PROPERTY_POST_PARENT);}
+	public function getGuid() {return $this->__get(self::PROPERTY_GUID);}
+	public function getMenuOrder() {return $this->__get(self::PROPERTY_MENU_ORDER);}
+	public function getPostType() {return $this->__get(self::PROPERTY_POST_TYPE);}
+	public function getPostMimeType() {return $this->__get(self::PROPERTY_POST_MIME_TYPE);}
+	public function getCommentCount() {return $this->__get(self::PROPERTY_COMMENT_COUNT);}
+	public function getAncestors() {return $this->__get(self::PROPERTY_ANCESTORS);}
+	public function getFilter() {return $this->__get(self::PROPERTY_FILTER);}
+	
+	// Post property setters
+	
+	public function setPostId($postId) {return $this->__set(self::PROPERTY_ID, $postId);}
+	public function setPostAuthor($postAuthor) {return $this->__set(self::PROPERTY_POST_AUTHOR, $postAuthor);}
+	public function setPostDate($postDate) {return $this->__set(self::PROPERTY_POST_DATE, $postDate);}
+	public function setPostDateGmt($postDateGmt) {return $this->__set(self::PROPERTY_POST_DATE_GMT, $postDateGmt);}
+	public function setPostContent($postContent) {return $this->__set(self::PROPERTY_POST_CONTENT, $postContent);}
+	public function setPostTitle($postTitle) {return $this->__set(self::PROPERTY_POST_TITLE, $postTitle);}
+	public function setPostExcerpt($postExcerpt) {return $this->__set(self::PROPERTY_POST_EXCERPT, $postExcerpt);}
+	public function setPostStatus($postStatus) {return $this->__set(self::PROPERTY_POST_STATUS, $postStatus);}
+	public function setCommentStatus($commentStatus) {return $this->__set(self::PROPERTY_COMMENT_STATUS, $commentStatus);}
+	public function setPingStatus($pingStatus) {return $this->__set(self::PROPERTY_PING_STATUS, $pingStatus);}
+	public function setPostPassword($postPassword) {return $this->__set(self::PROPERTY_POST_PASSWORD, $postPassword);}
+	public function setPostName($postName) {return $this->__set(self::PROPERTY_POST_NAME, $postName);}
+	public function setToPing($toPing) {return $this->__set(self::PROPERTY_TO_PING, $toPing);}
+	public function setPinged($pinged) {return $this->__set(self::PROPERTY_PINGED, $pinged);}
+	public function setPostModified($postModified) {return $this->__set(self::PROPERTY_POST_MODIFIED, $postModified);}
+	public function setPostModifiedGmt($postModifiedGmt) {return $this->__set(self::PROPERTY_POST_MODIFIED_GMT, $postModifiedGmt);}
+	public function setPostContentFiltered($postContentFiltered) {return $this->__set(self::PROPERTY_POST_CONTENT_FILTERED, $postContentFiltered);}
+	public function setPostParent($postParent) {return $this->__set(self::PROPERTY_POST_PARENT, $postParent);}
+	public function setGuid($guid) {return $this->__set(self::PROPERTY_GUID, $guid);}
+	public function setMenuOrder($menuOrder) {return $this->__set(self::PROPERTY_MENU_ORDER, $menuOrder);}
+	public function setPostType($postType) {return $this->__set(self::PROPERTY_POST_TYPE, $postType);}
+	public function setPostMimeType($postMimeType) {return $this->__set(self::PROPERTY_POST_MIME_TYPE, $postMimeType);}
+	public function setCommentCount($commentCount) {return $this->__set(self::PROPERTY_COMMENT_COUNT, $commentCount);}
+	public function setAncestors($ancestors) {return $this->__set(self::PROPERTY_ANCESTORS, $ancestors);}
+	public function setFilter($filter) {return $this->__set(self::PROPERTY_FILTER, $filter);}
 	
 }
