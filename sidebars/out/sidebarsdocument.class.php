@@ -25,7 +25,6 @@ class SidebarsDocument extends Document {
 		
 		$this->itsSidebars = $GLOBALS["wp_registered_sidebars"];
 		
-		
 	}
 	
 	public function build(array $options = NULL) {
