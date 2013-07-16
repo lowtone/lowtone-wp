@@ -128,8 +128,21 @@ class Query extends Object {
 		if ($postType = trim($this->qvar("post_type")))
 			return $postType;
 
-		if (($queriedObject = $this->{self::PROPERTY_QUERIED_OBJECT}) instanceof \WP_Post) 
+		$queriedObject = $this->{self::PROPERTY_QUERIED_OBJECT};
+
+		if ($queriedObject instanceof \WP_Post) 
 			return $queriedObject->{Post::PROPERTY_POST_TYPE};
+
+		if (is_object($queriedObject)) {
+
+			if (isset($queriedObject->taxonomy) && ($taxonomy = get_taxonomy($queriedObject->taxonomy))) {
+				
+				if (count($taxonomy->object_type) == 1)
+					return reset($taxonomy->object_type);
+
+			}
+
+		}
 
 		return Post::__postType();
 	}
@@ -137,7 +150,7 @@ class Query extends Object {
 	public function posts() {
 		$postClass =  "lowtone\\wp\\posts\\Post";
 
-		if (NULL != ($postType = get_post_type_object(self::postType()))) {
+		if (NULL !== ($postType = get_post_type_object(self::postType()))) {
 
 			if (isset($postType->post_class))
 				$postClass = $postType->post_class;
