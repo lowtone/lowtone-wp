@@ -29,8 +29,8 @@ class Collection extends Base {
 			->createDocument()
 			->build($options);
 
-		if ($template = @$options["template"])
-			$document->setTemplate($template);
+		if (isset($options["template"]))
+			$document->setTemplate($options["template"]);
 		
 		echo $document
 			->transform()
