@@ -76,7 +76,7 @@ final class Widget extends Base {
 		$form = $this->itsForm;
 
 		if (is_callable($form))
-			$form = call_user_func($form, $instance);
+			$form = call_user_func($form, $instance, $this);
 
 		if (!($form instanceof Form))
 			return true;
@@ -104,14 +104,22 @@ final class Widget extends Base {
 		if (!is_callable($this->itsUpdate))
 			return $newInstance;
 
-		return call_user_func_array($this->itsUpdate, func_get_args());
+		$args = func_get_args();
+
+		$args[] = $this;
+
+		return call_user_func_array($this->itsUpdate, $args);
 	}
 	
 	public function widget(array $args, array $instance = NULL) {
 		if (!is_callable($this->itsWidget))
 			return true;
 
-		return call_user_func_array($this->itsWidget, func_get_args());
+		$args = func_get_args();
+
+		$args[] = $this;
+
+		return call_user_func_array($this->itsWidget, $args);
 	}
 
 	// Static
