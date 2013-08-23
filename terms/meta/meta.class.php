@@ -78,7 +78,3 @@ class Meta extends Base {
 	}
 	
 }
-
-// Install on include
-
-Meta::install();
