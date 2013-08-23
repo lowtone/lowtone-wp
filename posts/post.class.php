@@ -534,6 +534,14 @@ class Post extends Record implements interfaces\Post, interfaces\Registrable {
 		$static = !(isset($this) && $this instanceof Post);
 		$class = get_called_class();
 
+		if (is_array($type) || is_object($type)) {
+			list($post, $type) = func_get_args();
+
+			$post = new $class($post);
+
+			return $post->is($type);
+		}
+
 		if (is_numeric($type)) {
 			list($id, $type) = func_get_args();
 
