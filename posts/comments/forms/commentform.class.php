@@ -14,39 +14,78 @@ use lowtone\ui\forms\Form,
  */
 class CommentForm extends Form implements Buildable {
 
+	const OPTION_FIELDS = "fields";
+
 	public function build(array $options = NULL) {
+		$options = array_merge(array(
+				self::OPTION_FIELDS => array("name", "email", "url"),
+			), (array) $options);
+
+		if (!is_user_logged_in()) {
+
+			$fields = (array) $options[self::OPTION_FIELDS];
+
+			$doName = in_array("name", $fields);
+			$doEmail = in_array("email", $fields);
+
+			if ($doName || $doEmail) {
+
+				$authorFieldSet = $this->createFieldSet(array(
+						FieldSet::PROPERTY_LEGEND => __("Author", "lowtone_wp")
+					));
+
+				if ($doName) {
+
+					$authorFieldSet
+						->appendChild(
+							$this->createInput(Input::TYPE_TEXT, array(
+									Input::PROPERTY_NAME => "name",
+									Input::PROPERTY_LABEL => __("Name", "lowtone_wp"),
+									Input::PROPERTY_PLACEHOLDER => __("Your name", "lowtone_wp"),
+								))
+						);
+
+				}
+				
+				if ($doEmail) {
+
+					$authorFieldSet
+						->appendChild(
+							$this->createInput(Input::TYPE_TEXT, array(
+									Input::PROPERTY_NAME => "email",
+									Input::PROPERTY_LABEL => __("Email", "lowtone_wp"),
+									Input::PROPERTY_PLACEHOLDER => __("Your email address", "lowtone_wp"),
+								))
+						);
+
+				}		
+
+				$this->appendChild($authorFieldSet);
+
+			}
+
+			if (in_array("url", $fields)) {
+
+				$this
+					->appendChild(
+							$this->createFieldSet(array(
+										FieldSet::PROPERTY_LEGEND => __("Website", "lowtone_wp")
+									))
+								->appendChild(
+										$this->createInput(Input::TYPE_TEXT, array(
+												Input::PROPERTY_NAME => "url",
+												Input::PROPERTY_LABEL => __("Website", "lowtone_wp"),
+												Input::PROPERTY_PLACEHOLDER => __("Your website", "lowtone_wp"),
+											))
+									)
+						);
+
+			}
+
+		}
+
+
 		$this
-			->appendChild(
-					$this->createFieldSet(array(
-								FieldSet::PROPERTY_LEGEND => __("Author", "lowtone_wp")
-							))
-						->appendChild(
-								$this->createInput(Input::TYPE_TEXT, array(
-										Input::PROPERTY_NAME => "name",
-										Input::PROPERTY_LABEL => __("Name", "lowtone_wp"),
-										Input::PROPERTY_PLACEHOLDER => __("Your name", "lowtone_wp"),
-									))
-							)
-						->appendChild(
-								$this->createInput(Input::TYPE_TEXT, array(
-										Input::PROPERTY_NAME => "email",
-										Input::PROPERTY_LABEL => __("Email", "lowtone_wp"),
-										Input::PROPERTY_PLACEHOLDER => __("Your email address", "lowtone_wp"),
-									))
-							)
-				)
-			->appendChild(
-					$this->createFieldSet(array(
-								FieldSet::PROPERTY_LEGEND => __("Website", "lowtone_wp")
-							))
-						->appendChild(
-								$this->createInput(Input::TYPE_TEXT, array(
-										Input::PROPERTY_NAME => "url",
-										Input::PROPERTY_LABEL => __("Website", "lowtone_wp"),
-										Input::PROPERTY_PLACEHOLDER => __("Your website", "lowtone_wp"),
-									))
-							)
-				)
 			->appendChild(
 					$this->createFieldSet(array(
 								FieldSet::PROPERTY_LEGEND => __("Message", "lowtone_wp")
