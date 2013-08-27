@@ -49,6 +49,13 @@ class Collection extends Base {
 		return parent::offsetSet($index, $newval);
 	}
 
+	public function offsetExists($index) {
+		if (is_string($index)) 
+			return (bool) $this->findByKey($index)->count();
+
+		return parent::offsetExists($index);
+	}
+
 	// Static
 
 	public static function __getObjectClass() {
