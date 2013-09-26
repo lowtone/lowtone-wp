@@ -128,12 +128,43 @@ final class Widget extends Base {
 		return new Widget((array) $properties);
 	}
 
+	/**
+	 * Register a new Simple Widget. WordPress requires the widget factory to be 
+	 * set up before widgets can be registered. This method checks if the 
+	 * environment was set up correctly and the widget_init action was triggered
+	 * and registers a callback to register the widget if it hadn't yet.
+	 * @param array|NULL $properties The properties for the simple widget.
+	 * @return Widget|bool Returns the simple widget instance if the widget was 
+	 * registered successfully, TRUE if the a callback to register the widget 
+	 * was created or FALSE if the widget registration failed.
+	 */
 	public static function register(array $properties = NULL) {
-		if (!(($factory = $GLOBALS["wp_widget_factory"])) instanceof WP_Widget_Factory) {
+
+		// Check for the widget factory
+		
+		if (!(isset($GLOBALS["wp_widget_factory"]) && ($factory = $GLOBALS["wp_widget_factory"]) instanceof WP_Widget_Factory)) {
+
+			// Check if widgets_init was triggered
+			
+			if (did_action("widgets_init") < 1) {
+
+				// Register callback
+
+				add_action("widgets_init", function() use ($properties) {
+					Widget::register($properties);
+				});
+
+				return true;
+			}
+
+			// On failure
+
 			trigger_error("Can't register Simple Widget without widget factory", E_USER_NOTICE);
 
 			return false;
 		}
+
+		// Register the widget
 
 		return ($factory->widgets[sprintf("Widget_%s", md5(@$properties[self::PROPERTY_ID]))] = static::create($properties));
 	}
