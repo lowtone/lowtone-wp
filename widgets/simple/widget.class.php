@@ -90,6 +90,9 @@ final class Widget extends Base {
 			->walkChildren(function($element) use ($widget) {
 				if (!($element instanceof Input))
 					return;
+
+				if (is_null($element[Input::PROPERTY_NAME]))
+					return;
 				
 				$element[Input::PROPERTY_NAME] = $widget->get_field_name($element[Input::PROPERTY_NAME]);
 			})
