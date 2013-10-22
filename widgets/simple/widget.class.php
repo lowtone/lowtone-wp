@@ -35,9 +35,16 @@ final class Widget extends Base {
 	 */
 	protected $itsWidget;
 
+	/**
+	 * Defaults for the instance
+	 * @var array|callable
+	 */
+	protected $itsDefaults;
+
 	const PROPERTY_FORM = "form",
 		PROPERTY_UPDATE = "update",
-		PROPERTY_WIDGET = "widget";
+		PROPERTY_WIDGET = "widget",
+		PROPERTY_DEFAULTS = "defaults";
 
 	public function __construct(array $properties = NULL) {
 		$properties = (array) $properties;
@@ -70,10 +77,15 @@ final class Widget extends Base {
 		if (isset($properties[self::PROPERTY_WIDGET]))
 			$this->itsWidget = $properties[self::PROPERTY_WIDGET];
 
+		if (isset($properties[self::PROPERTY_DEFAULTS]))
+			$this->itsDefaults = $properties[self::PROPERTY_DEFAULTS];
+
 	}
 	
 	public function form(array $instance = NULL) {
 		$form = $this->itsForm;
+
+		$instance = $this->__defaults($instance);
 
 		if (is_callable($form))
 			$form = call_user_func($form, $instance, $this);
@@ -118,11 +130,22 @@ final class Widget extends Base {
 		if (!is_callable($this->itsWidget))
 			return true;
 
-		$args = func_get_args();
-
-		$args[] = $this;
+		$args = array(
+				$args,
+				$this->__defaults($instance),
+				$this
+			);
 
 		return call_user_func_array($this->itsWidget, $args);
+	}
+
+	protected function __defaults($instance) {
+		$defaults = $this->itsDefaults;
+
+		if (is_callable($defaults))
+			$defaults = call_user_func($defaults);
+
+		return array_merge((array) $defaults, (array) $instance);
 	}
 
 	// Static
