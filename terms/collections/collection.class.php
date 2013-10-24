@@ -1,6 +1,7 @@
 <?php
 namespace lowtone\wp\terms\collections;
-use lowtone\db\records\collections\Collection as Base;
+use lowtone\db\records\collections\Collection as Base,
+	lowtone\wp\terms\Term;
 
 /**
  * @author Paul van der Meijs <code@lowtone.nl>
@@ -10,6 +11,12 @@ use lowtone\db\records\collections\Collection as Base;
  * @package wordpress\libs\lowtone\wp\terms\collections
  */
 class Collection extends Base {
+
+	public function taxonomy($taxonomy) {
+		return $this->find(array(
+				Term::PROPERTY_TAXONOMY => $taxonomy
+			));
+	}
 
 	// Static
 
