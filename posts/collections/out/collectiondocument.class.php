@@ -12,6 +12,14 @@ use lowtone\types\objects\collections\out\CollectionDocument as Base,
  * @package wordpress\libs\lowtone\types\objects\out
  */
 class CollectionDocument extends Base {
+
+	public function __construct(Collection $collection) {
+		parent::__construct($collection);
+
+		$this->updateBuildOptions(array(
+				self::COLLECTION_ELEMENT_NAME => Post::__postType() . "s"
+			));
+	}
 	
 	public function build(array $options = NULL) {
 		parent::build($options);
