@@ -80,7 +80,7 @@ class PostDocument extends ObjectDocument implements WpDocument {
 		};
 		
 		$this->updateBuildOptions(array(
-			self::OBJECT_ELEMENT_NAME => "post",
+			self::OBJECT_ELEMENT_NAME => Post::__postType(),
 			self::BUILD_ATTRIBUTES => array(
 				Post::PROPERTY_ID,
 				Post::PROPERTY_GUID
