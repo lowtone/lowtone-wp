@@ -363,6 +363,60 @@ class Post extends Record implements interfaces\Post, interfaces\Registrable {
 
 		return $this;
 	}
+
+	// Overload offsetGet and offsetSet
+	
+	public function offsetExists($index) {
+		switch ($index) {
+			case "meta":
+			case "taxonomies":
+			case "terms":
+			case "comments":
+			case "adjacent":
+				return true;
+		}
+
+		return parent::offsetExists($index);
+	}
+	
+	public function offsetGet($index) {
+		switch ($index) {
+			case "meta":
+				return $this->getMeta();
+
+			case "taxonomies":
+				return $this->getTaxonomies();
+
+			case "terms":
+				return $this->getTerms();
+
+			case "comments":
+				return $this->getComments();
+
+			case "adjacent":
+				return $this->getAdjacent();
+		}
+
+		return parent::offsetGet($index);
+	}
+
+	public function offsetSet($index, $newval) {
+		switch ($index) {
+			case "meta":
+				return $this->setMeta($newval);
+
+			case "taxonomies":
+				return $this->setTaxonomies($newval);
+
+			case "terms":
+				return $this->setTerms($newval);
+
+			case "comments":
+				return $this->setComments($newval);
+		}
+
+		return parent::offsetSet($index, $newval);
+	}
 	
 	// Meta related
 	
