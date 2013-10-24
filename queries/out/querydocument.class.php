@@ -94,6 +94,8 @@ class QueryDocument extends ObjectDocument {
 				$queryElement->appendChild($paginationElement);
 				
 		}
+
+		do_action("build_query_document", $this, $this->itsQuery);
 		
 		return $this;
 	}

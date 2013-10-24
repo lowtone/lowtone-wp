@@ -169,5 +169,11 @@ class Query extends Object {
 	public function __getQuery() {
 		return $this->itsQuery;
 	}
+
+	// Static
+	
+	public static function __getDocumentClass() {
+		return __NAMESPACE__ . "\\out\\QueryDocument";
+	}
 	
 }
