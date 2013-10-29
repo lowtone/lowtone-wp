@@ -364,6 +364,12 @@ class Post extends Record implements interfaces\Post, interfaces\Registrable {
 		return $this;
 	}
 
+	// Comments
+	
+	public function commentsOpen() {
+		return apply_filters("comments_open", self::STATUS_OPEN == $this->{self::PROPERTY_COMMENT_STATUS}, $this->{self::PROPERTY_ID});
+	}
+
 	// Overload offsetGet and offsetSet
 	
 	public function offsetExists($index) {
@@ -690,11 +696,11 @@ class Post extends Record implements interfaces\Post, interfaces\Registrable {
 	}
 	
 	public static function __getDocumentClass() {
-		return "lowtone\\wp\\posts\\out\\PostDocument";
+		return __NAMESPACE__ . "\\out\\PostDocument";
 	}
 	
 	public static function __getCollectionClass() {
-		return "lowtone\\wp\\posts\\collections\\Collection";
+		return __NAMESPACE__ . "\\collections\\Collection";
 	}
 
 	public static function __postType() {
@@ -702,7 +708,7 @@ class Post extends Record implements interfaces\Post, interfaces\Registrable {
 	}
 
 	public static function __register(array $options = NULL) {
-		$postType = strtolower($name = ucfirst(@$options[self::OPTION_POST_TYPE] ?: static::__postType()));
+		$postType = strtolower($name = ucfirst(isset($options[self::OPTION_POST_TYPE]) ? $options[self::OPTION_POST_TYPE] : static::__postType()));
 
 		$plural = $name . "s";
 		$textdomain = @$options[self::OPTION_TEXTDOMAIN] ?: "default";

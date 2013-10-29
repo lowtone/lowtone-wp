@@ -237,7 +237,7 @@ class PostDocument extends ObjectDocument implements WpDocument {
 
 		// Comment form
 
-		if ($this->getBuildOption(self::BUILD_COMMENT_FORM) && $this->itsObject->getCommentStatus() == 'open') {
+		if ($this->getBuildOption(self::BUILD_COMMENT_FORM) && $this->itsObject->commentsOpen()) {
 
 			$commentFormDocument = new CommentFormDocument($this->itsObject);
 
