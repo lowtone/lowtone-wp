@@ -29,8 +29,8 @@ class User extends Record {
 		PROPERTY_USER_STATUS = "user_status",
 		PROPERTY_DISPLAY_NAME = "display_name";
 	
-	const META_USER_FIRSTNAME = "user_firstname",
-		META_USER_LASTNAME = "user_lastname",
+	const META_USER_FIRSTNAME = "first_name",
+		META_USER_LASTNAME = "last_name",
 		META_NICKNAME = "nickname",
 		META_USER_DESCRIPTION = "user_description",
 		META_WP_CAPABILITIES = "wp_capabilities",
