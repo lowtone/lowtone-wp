@@ -55,7 +55,9 @@ class ItemsDocument extends Document {
 
 		_wp_menu_item_classes_by_context($this->itsItems); // Add classes to items
 		
-		foreach ($this->itsItems as $item) {
+		$items = apply_filters("wp_nav_menu_objects", $this->itsItems, array());
+
+		foreach ($items as $item) {
 			$itemDocument = new ItemDocument($item);
 			
 			$itemDocument->build($this->getBuildOption(self::ITEM_DOCUMENT_OPTIONS));

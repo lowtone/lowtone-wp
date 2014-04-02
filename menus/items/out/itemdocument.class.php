@@ -26,7 +26,8 @@ class ItemDocument extends ObjectDocument {
 						Item::PROPERTY_TITLE,
 						Item::PROPERTY_TARGET,
 						Item::PROPERTY_ATTR_TITLE,
-						Item::PROPERTY_DESCRIPTION
+						Item::PROPERTY_DESCRIPTION,
+						Item::PROPERTY_TYPE,
 					)
 			));
 		

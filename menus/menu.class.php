@@ -50,7 +50,9 @@ class Menu extends Term {
 			
 			if (($items = wp_get_nav_menu_items($id)) !== false) {
 				
-				$itemObjs = array();
+				$allItemObjs = $itemObjs = array();
+
+				// $items = apply_filters("wp_nav_menu_objects", $items, array());
 				
 				foreach ($items as $item) {
 					$itemObj = new items\Item($item);
@@ -69,12 +71,13 @@ class Menu extends Term {
 							
 					}
 					
-					if (!($parent = $itemObj->getMenuItemParent())) 
-						$itemObjs[$itemObj->getDbId()] = $itemObj;
-					
-					else if ($parentObj = $itemObjs[$parent])
+					if (($parent = $itemObj->getMenuItemParent()) && ($parentObj = $allItemObjs[$parent])) 
 						$parentObj->addChild($itemObj);
-					
+					else 
+						$itemObjs[$itemObj->getDbId()] = $itemObj;
+
+					$allItemObjs[$itemObj->getDbId()] = $itemObj;
+
 				}
 				
 				$menu->setItems($itemObjs);
