@@ -1,6 +1,7 @@
 <?php
 namespace lowtone\wp\users;
-use lowtone\db\records\Record,
+use ErrorException,
+	lowtone\db\records\Record,
 	lowtone\db\records\schemata\Schema,
 	lowtone\db\records\schemata\properties\Property,
 	lowtone\types\datetime\DateTime,

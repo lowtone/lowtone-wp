@@ -210,14 +210,18 @@ class PostDocument extends ObjectDocument implements WpDocument {
 				User::PROPERTY_USER_ID => $this->itsObject->getPostAuthor()
 			));
 			
-			$author->load();
-			
-			$userDocument = new UserDocument($author);
-			
-			$userDocument->build($this->getBuildOption(self::USER_DOCUMENT_OPTIONS));
-			
-			if ($userElement = $this->importDocument($userDocument))
-				$postElement->appendChild($userElement);
+			try {
+				
+				$author->load();
+				
+				$userDocument = new UserDocument($author);
+				
+				$userDocument->build($this->getBuildOption(self::USER_DOCUMENT_OPTIONS));
+				
+				if ($userElement = $this->importDocument($userDocument))
+					$postElement->appendChild($userElement);
+
+			} catch (\Exception $e) {}
 				
 		}
 		
